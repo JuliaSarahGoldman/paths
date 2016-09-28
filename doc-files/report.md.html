@@ -1,0 +1,126 @@
+**Lab 1: Meshes**
+**Julia Goldman and Jose Rivas**
+
+Algorithm
+================================
+We took the mathematical algorithms we encountered in class and in the Graphics Codex, and turned them into code in [RayTrace](class_ray_tracer.html) class. Our main function was [rayTrace](class_ray_tracer.html#aa2022ff63611aa8f6d0be2a99da7ba31), which iterates through an image pixel by pixel and cast a ray from each pixel. Our [measureLight](class_ray_tracer.html#a58de272fd87b9a0214670540aa85d067) calculates a radiance for a single ray, by checking if it intersects a triangle or spehere, and then shading the resulting surfel if it does intersect. For indirect light, this occurs recursively, and we cast a given number of rays from wherever this one ray hits by calling measureLight from within itself repeatedly and adding the result to the radiance. We get the intersection by using a [findIntersection](class_ray_tracer.html#a7ce4baccc6a94d735806924d0da96ea2) function, which iterates through the triangles (and spheres) in the scene and calls helper methods to check if they are intersected and what their distance of intersection is. We create a surfel for the one that is intersected at the shortest distance. For spheres, we created [findSphereIntersection](class_ray_tracer.html#a316b57dbdef0caa33e03f2e08748620c), which uses the quadratic formula to determine if the sphere is intersected. We check the part that is square-roote dto determine if the sphere is missed, and compare (and check for positivity) the two results of the quadratic formula to determine which (if either) should be used. For triangles, we based [findTriangleIntersection](class_ray_tracer.html#a8b29bb094d8c113626fae1581bc15487) on the code from the Graphics Codex. We use the ray's origin and direction and the triangle's normal and vertices, to determine whether an intersection occurs, its distance, whether it is a backface, and what its barocentric coordinates are. Shading is done by [shade](class_ray_tracer.html#ad849722b3e00b09833aed34c224d43d7), also based on Graphics Codex code. It iterates through the lights, and for each one, checks if the lights [isVisible](class_ray_tracer.html#a724669e75029650fd597b9aa0b69dde6) from that light (for the purpose of creating shadows), and if it is computes the direct light by multiplying togther biradiance, finite scattering density, and the dot product of the vector from the light and the normal vector.
+
+Results
+================================
+
+![G3D Triangle without indirect light](DirectTriangle.png)
+
+![G3D Cornell Box without indirect light](DirectCornell.png)
+
+![Analytics Spheres with Triangles](AnalyticSpheres.png)
+
+![Analytics Spheres with Triangles with indirect Light](AnalyticSpheres2.png)
+
+
+![G3D Sponza at 640X400 Resolution. 3,339.496153 seconds (55.7 minutes)](Sponza.png)
+
+![Our Unique Scene](WonkyBox.png)
+
+![Our Unique Scene with Indirect Lighting](WonkyBox2.png)
+
+Unfortunately, due to a bug that we were unable to detect in our code, we were unable to generate an image with 2048 indirect rays for the Cornell Box. We believe that it may lie in the way we multi thread our program. Although we were able to generate pictures with 100 or fewer rays ina reasonable amount of time, after that the time needed grew huge, even though it ought to have been linear. Despite running our program for 172 minutes, we were unable to generate a Cornell Box with 2048 rays.
+
+Run Time
+================================
+
+![Time to completion with n Triangles](chartTris.png)
+
+The number of triangles decreases our performance linearly.
+
+![Time to completion with different Cores](chartCores.png)
+
+The number of cores we use increases our performance by almost a factor of 4.
+
+![Time to completion with n Pixels](chartPixels.png)
+
+Like with triangles, the number of pixels decreases our performance linearly.
+
+![Time to completion with n Lights](chartLights.png)
+
+Again, we see a linearly performance decrease as the number of lights increase.
+
+![Time to completion with n Indirect Rays](chartRays.png)
+
+Finally, the number of indirect rays decreases in performance linearly until it hits 100, at which point it increases drastically.
+
+Given all of the above, we then have a time bound of O((num(Triangles)*num(pixels)*num(Lights))/num(Cores)). This does not provide a good model when any of its factors are sufficiently small such that start up time plays a big role in the amount of time the process takes. 
+
+Questions
+================================
+1. The intersection could be derived from the system of equations formed from the equation that describes a ray and the equation that defines an infinite cylinder, plus the two infinte planes to represent the top and bottom of the cylinder. Check if the ray intersects the infite cylinder (at radius distance from the center line), and then check if it intersected within the desired height. For the top and bottom, check if the ray intersected an infinite plane at the top or bottom within a circle of the given radius from the appropriate side.
+2. For a non-analytic surface, one can compute the intersection with the ray using what is essentially a binary search. If at one point the ray is on the outside of the surface and at another it is on the inside, the ray must interest the surface somwhere in between. By continually looking at the halfway point between two points and then determining which side of it the intersect is on, one can approximate the intersection to a chosen degree.
+3. One can utilize a binary tree to sort one's triangles by distance from the camera. Then, one can test the triangles to see if they intersect a ray in order, from closest to furthest. The first triangle the ray intersects with is the closest, so you can stop checking triangles once one is hit. If the camera moves, the triangles need to be re-sorted. 
+
+Evaluation
+================================
+We deserve a B+/A-.
+Code Style: We believe our code is pretty straightforward. We make sure that RayTracer is initialized with the correct state and ensure that we pass by reference wherever possible. Barring a few mistakes, we think we did well.
+Workflow: We spent too much time correctimg small bugs, trying to get one thing perfect before we were willing to move on to something else. We need to think more in terms of the whole rather than in perfecting small parts. We should have kept better track of our bugs in our journal and actually written more.
+Report Quality: We believe that our report is reasonably well organized. It could be better if we worked on it more from the beginning and continued to update it as we worked. 
+Report Depth and Correctness: We believe most of our answers are correct. We could have answered some of the questions in more depth and definitely triple checked some of our conclusions.
+
+Reflections
+================================
+
+Mathematical Reflections:
+
+    -How indirect light is calculated.
+
+    -How to calculate an intersect.
+
+Algorithmic Reflections:
+
+    -How to recursively calculate an integral.
+
+    -How shadows are created.
+
+Software Engineering Reflections:
+
+    -Look for helpful existing functions to edit for own purposes (don't reinvent the wheel).
+
+    -How to do multi-threading in C++.
+
+    -How to make lamda functions in C++.
+
+    -How to deal with shared pointers.
+
+    -How to work with rays.
+
+    -A deeper understanding of vectors.
+
+Other Reflections:
+
+    -Always read the book
+
+
+Workflow
+================================
+
+Task | Description | Planned Time (h) | Actual Time (h)
+-----|-------------|------------------|----------------
+Report Draft | Markdeep document with some simple answers. | .2 | .2|
+GUI draft | GUI that appears but does nothing. | .2 | .2 |
+findIntersection draft | function that gives some surfel | .1 | .2 |
+measureLight draft | copy code from class | .1 | .2 |
+rayTrace draft | copy code from class | .1 | .2 |
+multithreading Draft | start implementing multithreading capabilities | .2 | .2|
+findIntersection MVP | implement intersection algorithm | 1 |1.2 |
+measureLight MVP | implement recursive algorithm | 1 |1 |
+rayTrace MVP | call measure light on each pixel | .2 |.2 |
+GUI MVP | GUI calls on rayTrace algorithm | .3 | .1|
+MultiThreading MVP | implement multithreading | .5 |.5 |
+Shading Draft | Compute direct illumination | .3 | 4|
+Shading MVP | Compute Shadows | .3 | 1|
+Polishing | Make everything better| 4 | 9|
+
+MVP: Julia: 8 hours,  Jose: 8.5 hours
+Polishing: 9 hours polishing
+
+
+<!-- Markdeep: -->
+<style class="fallback">body{visibility:hidden;white-space:pre;font-family:monospace;}</style><script src="https://casual-effects.com/markdeep/latest/markdeep.min.js"></script><script>window.alreadyProcessedMarkdeep||(document.body.style.visibility="visible")</script>
