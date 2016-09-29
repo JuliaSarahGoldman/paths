@@ -20,6 +20,8 @@ protected:
     float m_height;
     int m_slices;
     String m_heightfieldSource;
+    /** Allocated by expose and render */
+    shared_ptr<Texture> m_result;
     /** Called from onInit */
     void makeGUI();
 
