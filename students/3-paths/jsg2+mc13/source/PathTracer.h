@@ -17,7 +17,7 @@ class PathTracer {
         Array<bool> m_lightShadowedBuffer;
 
 
-        Radiance3 measureLight(const shared_ptr<Scene>& scene, const Ray& ray, int numScatters) const;
+        Radiance3 measureLight(const Ray& ray, int numScatters) const;
         Radiance3 shade(const Ray& ray, const shared_ptr<Surfel>& surfel) const;
         bool isVisible(const Point3& X, const Point3& Y) const;
         
