@@ -8,15 +8,6 @@ class PathTracer {
         shared_ptr<Scene> m_scene;
         float m_lastTreeBuildTime;
 
-        //Will be passed, not stored
-        Array<Color3> m_modulationBuffer;
-        Array<Ray> m_rayBuffer;
-        Array<Surfel> m_surfelBuffer;
-        Array<Radiance3> m_biradianceBuffer;
-        Array<Ray> m_shadowRayBuffer;
-        Array<bool> m_lightShadowedBuffer;
-
-
         // Radiance3 measureLight(const Ray& ray, int numScatters) const;
         // Radiance3 shade(const Ray& ray, const shared_ptr<Surfel>& surfel) const;
         
@@ -33,17 +24,17 @@ class PathTracer {
         /*set the image to all black*/
         void resetImage();
         /*generate primary rays*/
-        void generatePrimaryRays();
+        void generatePrimaryRays(const Array<Ray>& rayBuffer, const Array<Color3>& modulationBuffer) const;
         /*add emissive terms (use the sky's radiance for missed rays and
                 apply the modulation buffer)*/
-        void addEmissiveTerms();
+        void addEmissiveTerms(const Array<Radiance3>& biradianceBuffer, const Array<Color3>& modulationBuffer) const;
         /*choose which light to sample, measuring biradiance and
                    computing a shadow ray*/
-        void computeShadowRays();
+        void computeShadowRays(const Array<Ray>& shadowRayBuffer, const Array<Radiance3>& biradianceBuffer) const;
         /*cast all shadow rays*/
-        void castShadowRays();
+        void castShadowRays(const Array<Ray>& shadowRayBuffer, const Array<Radiance3>& biradianceBuffer);
         /*shade all hit points*/
-        void shadeHitpoints();
+        void shadeHitpoints(const Array<Ray>& shadowRayBuffer, const Array<bool>& lightShadowedBuffer) const;
         /*scatter the rays, multiplying the modulation buffer by
                    the scattering weights*/
         void scatter();

@@ -5,12 +5,12 @@
 PathTracer::PathTracer(const shared_ptr<Scene>& scene) {};
 
 void PathTracer::traceImage(const shared_ptr<Camera>& cam, const shared_ptr<Image>& image) {
-    Array<Color3> m_modulationBuffer;
-    Array<Ray> m_rayBuffer;
-    Array<shared_ptr<Surfel>> m_surfelBuffer;
-    Array<Radiance3> m_biradianceBuffer;
-    Array<Ray> m_shadowRayBuffer;
-    Array<bool> m_lightShadowedBuffer;
+    Array<Color3> modulationBuffer(Array<Color3>());
+    Array<Ray> rayBuffer;
+    Array<shared_ptr<Surfel>> surfelBuffer;
+    Array<Radiance3> biradianceBuffer;
+    Array<Ray> shadowRayBuffer;
+    Array<bool> lightShadowedBuffer;
 };
 
 Radiance3 PathTracer::L_in(const Point3& X, const Vector3& w_in, int pathDepth, const TriTree& triArray) const {
@@ -69,15 +69,15 @@ void PathTracer::buildTree() {};
 
 void PathTracer::resetImage() {};
 
-void PathTracer::generatePrimaryRays() {};
+void PathTracer::generatePrimaryRays(const Array<Ray>& rayBuffer, const Array<Color3>& modulationBuffer) const {};
 
-void PathTracer::addEmissiveTerms() {};
+void PathTracer::addEmissiveTerms(const Array<Radiance3>& biradianceBuffer, const Array<Color3>& modulationBuffer) const{};
 
-void PathTracer::computeShadowRays() {};
+void PathTracer::computeShadowRays(const Array<Ray>& shadowRayBuffer, const Array<Radiance3>& biradianceBuffer) const {};
 
-void PathTracer::castShadowRays() {};
+void PathTracer::castShadowRays(const Array<Ray>& shadowRayBuffer, const Array<Radiance3>& biradianceBuffer) {};
 
-void PathTracer::shadeHitpoints() {};
+void PathTracer::shadeHitpoints(const Array<Ray>& shadowRayBuffer, const Array<bool>& lightShadowedBuffer) const {};
 
 void PathTracer::scatter() {};
 

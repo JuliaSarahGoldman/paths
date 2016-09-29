@@ -7,6 +7,12 @@
     <ClCompile Include="source\RayTracer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="source\RayTracerM.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="source\PathTracer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="source\App.h">
@@ -19,9 +25,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="source\PathTracer.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="source\AppM.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
