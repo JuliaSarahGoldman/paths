@@ -1,6 +1,6 @@
 /** \file App.cpp */
 #include "App.h"
-#include "RayTracer.h"
+#include "PathTracer.h"
 // Tells C++ to invoke command-line main() function even on OS X and Win32.
 G3D_START_AT_MAIN();
 
@@ -221,6 +221,7 @@ void App::makeGlass(int slices){
 // automatically caught.
 void App::onInit() {
     GApp::onInit();
+    PathTracer tracer = PathTracer(scene());
     makeTriangles(1000);
     makeFountainPiece();
     makeSplash();
@@ -260,41 +261,41 @@ void App::makeTriangles(int numTris){
 }
 
 void App::makeGUI() {
+    PathTracer tracer = PathTracer(scene());
+
     // Initialize the developer HUD
     createDeveloperHUD();
 
     debugWindow->setVisible(true);
     developerWindow->videoRecordDialog->setEnabled(true);
 
-    GuiPane* rayTracePane = debugPane->addPane("Ray Trace");
+    GuiPane* pathTracePane = debugPane->addPane("Path Trace");
  
-    rayTracePane->setNewChildSize(240);
+    pathTracePane->setNewChildSize(240);
     GuiText temp("1x1");
-    Array<GuiText> resolutionMenu(temp);
+    /*Array<GuiText> resolutionMenu(temp);
     temp = "320x200";
     resolutionMenu.append(temp);
     temp = "640x400";
     resolutionMenu.append(temp);
-    GuiDropDownList* list(rayTracePane->addDropDownList("Resolution", resolutionMenu));
+    GuiDropDownList* list(rayTracePane->addDropDownList("Resolution", resolutionMenu));*/
 
-    rayTracePane->beginRow(); {
+    /*pathTracePane->beginRow(); {
     rayTracePane->addCheckBox("Fixed Primitives",  &m_hasFixedPrimitives, GuiTheme::NORMAL_CHECK_BOX_STYLE);
     rayTracePane->addCheckBox("Multithreading",  &m_isMultithreaded, GuiTheme::NORMAL_CHECK_BOX_STYLE);
-    } rayTracePane->endRow();
+    } rayTracePane->endRow();*/
 
-    rayTracePane->addNumberBox("Indirect Rays", &m_indirectRaysPPx, " ppx", GuiTheme::LOG_SLIDER, 0, 2048) -> setUnitsSize(100);
+    pathTracePane->addNumberBox("Light Transport Paths", &tracer.m_numPaths, " ppx", GuiTheme::LOG_SLIDER, 0, 2048) -> setUnitsSize(100);
+    pathTracePane->addNumberBox("Maximum Scatters", &tracer.m_maxScatters, "", GuiTheme::LOG_SLIDER, 0, 2048) -> setUnitsSize(100);
 
-    rayTracePane->addButton("Render", [this, list, rayTracePane](){
-        drawMessage("Ray Tracer is loading");
+    pathTracePane->addButton("Render", [this, pathTracePane, &tracer](){
+        drawMessage("Path Tracer is loading");
         shared_ptr<G3D::Image> image;
         try{
-            if(!list->selectedIndex()) image = Image::create(1, 1, ImageFormat::RGB32F());
-            else if (list->selectedIndex() == 1) image = Image::create(320,200, ImageFormat::RGB32F());
-            else image = Image::create(640,420, ImageFormat::RGB32F());
-            RayTracer tracer = RayTracer(scene(), m_isMultithreaded, m_indirectRaysPPx, m_hasFixedPrimitives);
+            image = Image::create(50, 50, ImageFormat::RGB32F());          
             Stopwatch watch("watch");
             watch.tick();
-            tracer.rayTrace(scene(), activeCamera(), image);
+            tracer.traceImage(activeCamera(), image);
             watch.tock();
             debugPrintf(String(std::to_string(watch.smoothElapsedTime()) + " seconds").c_str());
             show(image, String(std::to_string(watch.smoothElapsedTime()) + " seconds + Numcores = " + std::to_string(G3D::System::numCores())));
