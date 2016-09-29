@@ -17,10 +17,16 @@ class PathTracer {
         Array<bool> m_lightShadowedBuffer;
 
 
-        Radiance3 measureLight(const Ray& ray, int numScatters) const;
-        Radiance3 shade(const Ray& ray, const shared_ptr<Surfel>& surfel) const;
-        bool isVisible(const Point3& X, const Point3& Y) const;
+        // Radiance3 measureLight(const Ray& ray, int numScatters) const;
+        // Radiance3 shade(const Ray& ray, const shared_ptr<Surfel>& surfel) const;
         
+        Radiance3 L_in(const Point3& X, const Vector3& w_in, int pathDepth, const TriTree& triArray) const; 
+        Radiance3 L_out(const Point3& X, const Vector3& w_out, const Vector3& n, const Color3& f, const Radiance3& L_e, int pathDepth,const TriTree& triArray) const; 
+      
+        bool isVisible(const Point3& X, const Point3& Y) const;
+    
+        Radiance3 backgroundRadiance(const Vector3& direction) const; 
+                
         /*extract surfaces from the scene
         rebuild the tree*/
         void buildTree();
