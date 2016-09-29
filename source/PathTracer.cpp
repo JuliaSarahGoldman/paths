@@ -12,16 +12,36 @@ Radiance3 PathTracer::L_in(const Point3& X, const Vector3& w_in, int pathDepth, 
 
     // Compute the light leaving Y, which is the same as
         // the light entering X when the medium is non-absorptive
-    return L_out(surfel,-w_in, 1, triArray);
+    return L_out(surfel, -w_in, pathDepth, triArray);
 
 };
 Radiance3 PathTracer::L_out(const shared_ptr<Surfel>& surfel, const Vector3& w_out, int pathDepth, const TriTree& triArray) const {
-    if (notNull(surfel)){
+    if (notNull(surfel)) {
+        const Radiance3& L(surfel->emittedRadiance); // Emitted
+
         const Vector3& n(surfel->shadingNormal);
-        const Vector3& w_in(Vector3::cosHemiRandom(n,Random::threadCommon()));
+        const Vector3& w_in(Vector3::cosHemiRandom(n, Random::threadCommon()));
         const Point3& X(surfel->position*EPSILON* sign((w_in).dot(n)));
+     
         
-    } else {
+        Array<shared_ptr<Light>> lights(m_scene->lightingEnvironment().lightArray);
+        for (int i = 0; i < lights.size(); ++i) {
+            const shared_ptr<Light>& light(lights[i]);
+            const Point3& Y = light->position().xyz();
+
+            if (!light->castsShadows() || isVisible(X, Y)) {
+                const Vector3& w_i = (Y - X).direction();
+                Biradiance3& Bi = light->biradiance(X);
+
+                const Color3& f = surfel->finiteScatteringDensity(w_i, -w_out);
+                L += Bi * f * abs(w_i.dot(n));
+            }
+        }
+
+        return L; 
+
+    }
+    else {
         return backgroundRadiance(w_out);
     }
 
