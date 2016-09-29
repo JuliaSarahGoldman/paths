@@ -4,7 +4,14 @@
 
 PathTracer::PathTracer(const shared_ptr<Scene>& scene) {};
 
-void PathTracer::traceImage(const shared_ptr<Camera>& cam, const shared_ptr<Image>& image) {};
+void PathTracer::traceImage(const shared_ptr<Camera>& cam, const shared_ptr<Image>& image) {
+    Array<Color3> m_modulationBuffer;
+    Array<Ray> m_rayBuffer;
+    Array<shared_ptr<Surfel>> m_surfelBuffer;
+    Array<Radiance3> m_biradianceBuffer;
+    Array<Ray> m_shadowRayBuffer;
+    Array<bool> m_lightShadowedBuffer;
+};
 
 Radiance3 PathTracer::L_in(const Point3& X, const Vector3& w_in, int pathDepth, const TriTree& triArray) const {
     // Find the first intersection 
@@ -22,29 +29,35 @@ Radiance3 PathTracer::L_out(const shared_ptr<Surfel>& surfel, const Vector3& w_o
         const Vector3& n(surfel->shadingNormal);
         const Vector3& w_in(Vector3::cosHemiRandom(n, Random::threadCommon()));
         const Point3& X(surfel->position*EPSILON* sign((w_in).dot(n)));
-     
-        
+
+
         Array<shared_ptr<Light>> lights(m_scene->lightingEnvironment().lightArray);
         for (int i = 0; i < lights.size(); ++i) {
             const shared_ptr<Light>& light(lights[i]);
             const Point3& Y = light->position().xyz();
 
             if (!light->castsShadows() || isVisible(X, Y)) {
-                const Vector3& w_i = (Y - X).direction();
+                const Vector3& w_in = (Y - X).direction();
                 Biradiance3& Bi = light->biradiance(X);
 
-                const Color3& f = surfel->finiteScatteringDensity(w_i, -w_out);
-                L += Bi * f * abs(w_i.dot(n));
+                const Color3& f = surfel->finiteScatteringDensity(w_in, -w_out);
+                L += Bi * f * abs(w_in.dot(n));
             }
         }
 
-        return L; 
+        Radiance3& indirectLight(Radiance3(0, 0, 0));
+        if (m_maxScatters < pathDepth) {
+            const Vector3& w_i(Vector3::cosHemiRandom(n, Random::threadCommon()));
+            const Color3& f(surfel->finiteScatteringDensity(w_i, -w_out));
+            indirectLight += L_in(X, w_i, pathDepth + 1, triArray)*f;
+        }
+
+        return L + indirectLight / m_maxScatters;
 
     }
     else {
         return backgroundRadiance(w_out);
     }
-
 };
 
 bool  PathTracer::isVisible(const Point3& X, const Point3& Y) const {};
