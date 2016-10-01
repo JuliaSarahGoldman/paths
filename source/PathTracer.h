@@ -12,7 +12,7 @@ class PathTracer {
         // Radiance3 shade(const Ray& ray, const shared_ptr<Surfel>& surfel) const;
         
         Radiance3 L_in(const Point3& X, const Vector3& w_in, int pathDepth, const TriTree& triArray) const; 
-        Radiance3 L_out(const shared_ptr<Surfel>& surfel,const Vector3& w_out, int pathDepth,const TriTree& triArray) const; 
+        Radiance3 L_out(const shared_ptr<Surfel>& surfel, const Vector3& w_out, const Array<shared_ptr<Light>>& lights) const;
       
         bool isVisible(const Point3& X, const Point3& Y) const;
     
@@ -53,7 +53,7 @@ class PathTracer {
         void updateModulation(const Array<Color3>& modulationBuffer, const int j);
 
         // Writes emmitted and sampled direct light to image for each iteration
-        void writeToImage(const Array<Ray>& shadowRayBuffer, const Array<Radiance3>& biradianceBuffer, const Array<shared_ptr<Surfel>>& surfelBuffer, const Array<Color3>& modulationBuffer, const int j) const; 
+        void writeToImage(const Array<Ray>& shadowRayBuffer, const Array<Radiance3>& biradianceBuffer, const Array<shared_ptr<Surfel>>& surfelBuffer, const Array<Color3>& modulationBuffer, const int j, const shared_ptr<Image>& image, const Array<Ray>& rayBuffer, const Array<shared_ptr<Light>>& lights) const;
           
         void scatter();
 
