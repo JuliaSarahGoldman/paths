@@ -54,6 +54,14 @@ void PathTracer::writeToImage(const Array<Ray>& shadowRayBuffer, const Array<Rad
     image->set(Point2int32(j%image->width(), j/image->width()), current);
 };
 
+void PathTracer::generateRecursiveRays(Array<Ray>& rayBuffer, const Array<shared_ptr<Surfel>>& surfelBuffer, Array<Color3>& modulationBuffer, const int j) const{
+    Vector3 wo;
+    Color3 weight;
+    surfelBuffer[j]->scatter(PathDirection::EYE_TO_SOURCE, rayBuffer[j].direction(), true, Random::threadCommon(), weight, wo);
+    rayBuffer[j] = Ray(surfelBuffer[j]->position, wo);
+    modulationBuffer[j] *= weight;
+};
+
 //Don't use anymore
 Radiance3 PathTracer::L_in(const Point3& X, const Vector3& w_in, int pathDepth, const TriTree& triArray) const {
     // Find the first intersection 
