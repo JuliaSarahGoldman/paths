@@ -5,9 +5,15 @@
 PathTracer::PathTracer(const shared_ptr<Scene>& scene) {};
 
 void PathTracer::traceImage(const shared_ptr<Camera>& cam, const shared_ptr<Image>& image) {
+   
+    
+    
     //Get the Array of lights
     const Array<shared_ptr<Light>> lights(m_scene->lightingEnvironment().lightArray);
     //Make the tree
+    Array<shared_ptr<Surface>> surfs;
+    m_scene->onPose(surfs);
+    m_triangles->setContents(surfs);
 
     const int& numPixels(image->height()*image->width());
     Array<Radiance3> biradianceBuffer;
@@ -27,8 +33,8 @@ void PathTracer::traceImage(const shared_ptr<Camera>& cam, const shared_ptr<Imag
         generatePrimaryRays(rayBuffer);
         
         for(int d(0); d < m_maxScatters; ++d){
-            m_triangles->intersectRays(rayBuffer, surfelBuffer);
-            for(int j(0); j < numPixels; ++j){computeShadowRays(shadowRayBuffer, surfelBuffer, lights, j); }    
+            m_triangles->intersectRays(rayBuffer, surfelBuffer);   
+            for(int j(0); j < numPixels; ++j){computeShadowRays(shadowRayBuffer, surfelBuffer, biradianceBuffer, lights, j); }    
             for(int j(0); j < numPixels; ++j){testVisibility(shadowRayBuffer, lightShadowedBuffer, j); }    //casts shadow rays
             // Increments image pixels -> by emissive and direct light, with importance sampling
             for(int j(0); j < numPixels; ++j){writeToImage(shadowRayBuffer, biradianceBuffer, surfelBuffer, modulationBuffer, j);}

@@ -34,7 +34,7 @@ class PathTracer {
       
         /*choose which light to sample, measuring biradiance and
                    computing a shadow ray*/
-        void computeShadowRays(const Array<Ray>& shadowRayBuffer, const Array<shared_ptr<Surfel>>& surfelBuffer, const Array<shared_ptr<Light>>& lights, const int j) const;
+        void computeShadowRays(const Array<Ray>& shadowRayBuffer, const Array<shared_ptr<Surfel>>& surfelBuffer, const Array<Radiance3>& biradianceBuffer, const Array<shared_ptr<Light>>& lights, const int j) const;
      
         /*cast all shadow rays*/
         void castShadowRays(const Array<Ray>& shadowRayBuffer, const Array<Radiance3>& biradianceBuffer, const int j);
