@@ -47,7 +47,7 @@ class PathTracer {
         void testVisibility(const Array<Ray>& shadowRayBuffer, const Array<bool>& lightShadowedBuffer, const int j) const; 
         
         // Generates new set of rays for the next iteration
-        void generateRecursiveRays(const Array<Color3>& rayBuffer, const Array<shared_ptr<Surfel>>& surfelBuffer, const int j) const;
+        void generateRecursiveRays(const Array<Ray>& rayBuffer, const Array<shared_ptr<Surfel>>& surfelBuffer, const int j) const;
         
         // updates the Modulation for the next iteration
         void updateModulation(const Array<Color3>& modulationBuffer, const int j);
