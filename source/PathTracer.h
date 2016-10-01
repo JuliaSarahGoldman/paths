@@ -24,19 +24,20 @@ class PathTracer {
         /*set the image to all black*/
         void resetImage();
         /*generate primary rays*/
-        void generatePrimaryRays(const Array<Ray>& rayBuffer, const Array<Color3>& modulationBuffer) const;
+        void generatePrimaryRays(const Array<Ray>& rayBuffer) const;
         /*add emissive terms (use the sky's radiance for missed rays and
                 apply the modulation buffer)*/
         void addEmissiveTerms(const Array<Radiance3>& biradianceBuffer, const Array<Color3>& modulationBuffer) const;
         /*choose which light to sample, measuring biradiance and
                    computing a shadow ray*/
-        void computeShadowRays(const Array<Ray>& shadowRayBuffer, const Array<Radiance3>& biradianceBuffer) const;
+        void computeShadowRays(const Array<Ray>& shadowRayBuffer, const Array<Radiance3>& biradianceBuffer, const Array<shared_ptr<Light>>& lights) const;
         /*cast all shadow rays*/
         void castShadowRays(const Array<Ray>& shadowRayBuffer, const Array<Radiance3>& biradianceBuffer);
         /*shade all hit points*/
-        void shadeHitpoints(const Array<Ray>& shadowRayBuffer, const Array<bool>& lightShadowedBuffer) const;
+        void shadeHitpoints(const Array<Ray>& shadowRayBuffer, const Array<bool>& lightShadowedBuffer, const Array<shared_ptr<Light>>& lights) const;
         /*scatter the rays, multiplying the modulation buffer by
                    the scattering weights*/
+  
         void scatter();
 
     public:
