@@ -18,29 +18,12 @@ class PathTracer {
     
         Radiance3 backgroundRadiance(const Vector3& direction) const; 
                 
-        /*extract surfaces from the scene
-        rebuild the tree*/
-        void buildTree();
-        
-        /*set the image to all black*/
-        void resetImage();
-        
         /*generate primary rays*/
         void generatePrimaryRays(Array<Ray>& rayBuffer,const shared_ptr<Camera>& cam, int width, int height, int j) const;
-       
-        /*add emissive terms (use the sky's radiance for missed rays and
-                apply the modulation buffer)*/
-        void addDirectLight(const Array<Ray>& shadowRayBuffer, const Array<Radiance3>& biradianceBuffer, const Array<Color3>& modulationBuffer, const int j) const;
       
         /*choose which light to sample, measuring biradiance and
                    computing a shadow ray*/
-        void computeShadowRays(const Array<Ray>& shadowRayBuffer, const Array<shared_ptr<Surfel>>& surfelBuffer, const Array<Radiance3>& biradianceBuffer, const Array<shared_ptr<Light>>& lights, const int j) const;
-     
-        /*cast all shadow rays*/
-        void castShadowRays(const Array<Ray>& shadowRayBuffer, const Array<Radiance3>& biradianceBuffer, const int j);
-     
-        /*shade all hit points*/
-        void shadeHitpoints(const Array<Ray>& shadowRayBuffer, const Array<bool>& lightShadowedBuffer, const Array<shared_ptr<Light>>& lights, const int j) const;
+        void computeShadowRays(Array<Ray>& shadowRayBuffer,  Array<Color3>& modulationBuffer, const Array<shared_ptr<Surfel>>& surfelBuffer, const Array<Radiance3>& biradianceBuffer, const Array<shared_ptr<Light>>& lights, const int j) const;
      
         /*scatter the rays, multiplying the modulation buffer by
                    the scattering weights*/
@@ -48,14 +31,9 @@ class PathTracer {
         
         // Generates new set of rays for the next iteration
         void generateRecursiveRays(Array<Ray>& rayBuffer, const Array<shared_ptr<Surfel>>& surfelBuffer, Array<Color3>& modulationBuffer, const int j) const;
-        
-        // updates the Modulation for the next iteration
-        void updateModulation(const Array<Color3>& modulationBuffer, const int j);
 
         // Writes emmitted and sampled direct light to image for each iteration
         void writeToImage(const Array<Ray>& shadowRayBuffer, const Array<Radiance3>& biradianceBuffer, const Array<shared_ptr<Surfel>>& surfelBuffer, const Array<Color3>& modulationBuffer, const int j, const shared_ptr<Image>& image, const Array<Ray>& rayBuffer, const Array<shared_ptr<Light>>& lights) const;
-          
-        void scatter();
 
     public:
         int m_numPaths;
