@@ -27,13 +27,15 @@ void PathTracer::traceImage(const shared_ptr<Camera>& cam, const shared_ptr<Imag
         generatePrimaryRays(rayBuffer);
         
         for(int d(0); d < m_maxScatters; ++d){
-            for(int j(0); j < numPixels; ++j){m_triangles->intersectRays(rayBuffer, surfelBuffer, j); }
-            for(int j(0); j < numPixels; ++j){computeShadowRays(shadowRayBuffer, biradianceBuffer, lights, j); }    
-            for(int j(0); j < numPixels; ++j){shadeHitpoints(shadowRayBuffer, lightShadowedBuffer, lights, j); }    
-            for(int j(0); j < numPixels; ++j){addEmissiveTerms(biradianceBuffer, modulationBuffer, j);}    
-            for(int j(0); j < numPixels; ++j){castShadowRays(shadowRayBuffer, biradianceBuffer, j);}    
-            for(int j(0); j < numPixels; ++j){}    
-            for(int j(0); j < numPixels; ++j){}    
+            m_triangles->intersectRays(rayBuffer, surfelBuffer);
+            for(int j(0); j < numPixels; ++j){computeShadowRays(shadowRayBuffer, surfelBuffer, lights, j); }    
+            for(int j(0); j < numPixels; ++j){testVisibility(shadowRayBuffer, lightShadowedBuffer, j); }    //casts shadow rays
+            // Increments image pixels -> by emissive and direct light, with importance sampling
+            for(int j(0); j < numPixels; ++j){writeToImage(shadowRayBuffer, biradianceBuffer, surfelBuffer, modulationBuffer, j);}
+            //Only if not last iteration.
+            for(int j(0); j < numPixels; ++j){generateRecursiveRays(rayBuffer, surfelBuffer, j);}    //set up for next loop
+           // for(int j(0); j < numPixels; ++j){updateModulation(modulationBuffer, rayBuffer, j);}    
+              
         }
     }
 
