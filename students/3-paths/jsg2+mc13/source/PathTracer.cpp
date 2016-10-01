@@ -15,7 +15,10 @@ void PathTracer::traceImage(const shared_ptr<Camera>& cam, const shared_ptr<Imag
     m_scene->onPose(surfs);
     m_triangles->setContents(surfs);
 
-    const int& numPixels(image->height()*image->width());
+    const int width(image->width());
+    const int height(image->height());
+    const int& numPixels(width*height);
+  
     Array<Radiance3> biradianceBuffer;
     biradianceBuffer.resize(numPixels);
 
@@ -30,7 +33,7 @@ void PathTracer::traceImage(const shared_ptr<Camera>& cam, const shared_ptr<Imag
     Array<bool> lightShadowedBuffer;
 
     for (int i(0); i < m_numPaths; ++i){
-        generatePrimaryRays(rayBuffer);
+        generatePrimaryRays(rayBuffer, cam, width, height, i);
         
         for(int d(0); d < m_maxScatters; ++d){
             m_triangles->intersectRays(rayBuffer, surfelBuffer);   
@@ -110,7 +113,15 @@ Radiance3 PathTracer::L_out(const shared_ptr<Surfel>& surfel, const Vector3& w_o
     }
 };
 
-bool  PathTracer::isVisible(const Point3& X, const Point3& Y) const {};
+bool  PathTracer::isVisible(const Point3& X, const Point3& Y) const {
+    Point3 origin (Y + FLT_EPSILON*(X-Y));
+    Vector3 direction = (X-Y).unit();
+    Ray newRay(origin, direction);
+    shared_ptr<Surfel> surfel;
+    if(findIntersection(surfel, newRay))
+        return (abs(surfel->position.x-X.x)<0.001f && abs(surfel->position.y-X.y) < 0.01f && abs(surfel->position.z - X.z) < 0.001f);
+    return false;
+};
 
 Radiance3  PathTracer::backgroundRadiance(const Vector3& direction) const {};
 
@@ -119,11 +130,26 @@ void PathTracer::buildTree() {};
 
 void PathTracer::resetImage() {};
 
-void PathTracer::generatePrimaryRays() {};
+void PathTracer::generatePrimaryRays(Array<Ray>& rayBuffer,const shared_ptr<Camera>& cam, int width, int height, int j) const {
+    Rect2D plane(Rect2D(Vector2(width, height)));
+    
+    for(Point2int32 pixel; pixel.y< height; ++pixel.y){
+        for(pixel.x = 0; pixel.x < width; ++pixel.x){
+            Ray ray(cam->worldRay(pixel.x, pixel.y, plane));
+            rayBuffer[j] = ray.bumpedRay(0.0001);
+        }
+    }
+};
+
+void PathTracer::testVisibility(const Array<Ray>& shadowRayBuffer, const Array<shared_ptr<Surfel>>& surfelBuffer, Array<bool>& lightShadowedBuffer, const int j) const {
+  shared_ptr<Surfel> other(m_triangles->intersectRay(shadowRayBuffer[j])); 
+  Point3 toCheck(surfelBuffer[j]->position - other->position);
+  lightShadowedBuffer[j]= ((abs(toCheck.x) <= 0.0001) && (abs(toCheck.y) <= 0.0001) && (abs(toCheck.z) <= 0.0001));
+}; 
 
 void PathTracer::addEmissiveTerms() {};
 
-void PathTracer::computeShadowRays() {};
+void PathTracer::computeShadowRays(const Array<Ray>& shadowRayBuffer, const Array<shared_ptr<Surfel>>& surfelBuffer, const Array<Radiance3>& biradianceBuffer, const Array<shared_ptr<Light>>& lights, const int j) const {};
 
 void PathTracer::castShadowRays() {};
 
