@@ -5,12 +5,38 @@
 PathTracer::PathTracer(const shared_ptr<Scene>& scene) {};
 
 void PathTracer::traceImage(const shared_ptr<Camera>& cam, const shared_ptr<Image>& image) {
-    Array<Color3> m_modulationBuffer;
-    Array<Ray> m_rayBuffer;
-    Array<shared_ptr<Surfel>> m_surfelBuffer;
-    Array<Radiance3> m_biradianceBuffer;
-    Array<Ray> m_shadowRayBuffer;
-    Array<bool> m_lightShadowedBuffer;
+    //Get the Array of lights
+    const Array<shared_ptr<Light>> lights(m_scene->lightingEnvironment().lightArray);
+    //Make the tree
+
+    const int& numPixels(image->height()*image->width());
+    Array<Radiance3> biradianceBuffer;
+    biradianceBuffer.resize(numPixels);
+
+    Array<Color3> modulationBuffer;
+    for (int i(0); i < numPixels; ++i){
+        modulationBuffer.append(Color3(1/m_maxScatters));
+    }
+
+    Array<Ray> rayBuffer;
+    Array<shared_ptr<Surfel>> surfelBuffer;   
+    Array<Ray> shadowRayBuffer;
+    Array<bool> lightShadowedBuffer;
+
+    for (int i(0); i < m_numPaths; ++i){
+        generatePrimaryRays(rayBuffer);
+        
+        for(int d(0); d < m_maxScatters; ++d){
+            for(int j(0); j < numPixels; ++j){m_triangles->intersectRays(rayBuffer, surfelBuffer, j); }
+            for(int j(0); j < numPixels; ++j){computeShadowRays(shadowRayBuffer, biradianceBuffer, lights, j); }    
+            for(int j(0); j < numPixels; ++j){shadeHitpoints(shadowRayBuffer, lightShadowedBuffer, lights, j); }    
+            for(int j(0); j < numPixels; ++j){addEmissiveTerms(biradianceBuffer, modulationBuffer, j);}    
+            for(int j(0); j < numPixels; ++j){castShadowRays(shadowRayBuffer, biradianceBuffer, j);}    
+            for(int j(0); j < numPixels; ++j){}    
+            for(int j(0); j < numPixels; ++j){}    
+        }
+    }
+
 };
 
 Radiance3 PathTracer::L_in(const Point3& X, const Vector3& w_in, int pathDepth, const TriTree& triArray) const {
