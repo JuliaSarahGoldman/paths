@@ -26,7 +26,7 @@ class PathTracer {
         void resetImage();
         
         /*generate primary rays*/
-        void generatePrimaryRays(const Array<Ray>& rayBuffer) const;
+        void generatePrimaryRays(Array<Ray>& rayBuffer,const shared_ptr<Camera>& cam, int width, int height, int j) const;
        
         /*add emissive terms (use the sky's radiance for missed rays and
                 apply the modulation buffer)*/
@@ -44,7 +44,7 @@ class PathTracer {
      
         /*scatter the rays, multiplying the modulation buffer by
                    the scattering weights*/
-        void testVisibility(const Array<Ray>& shadowRayBuffer, const Array<bool>& lightShadowedBuffer, const int j) const; 
+        void testVisibility(const Array<Ray>& shadowRayBuffer, const Array<shared_ptr<Surfel>>& surfelBuffer, Array<bool>& lightShadowedBuffer, const int j) const; 
         
         // Generates new set of rays for the next iteration
         void generateRecursiveRays(Array<Ray>& rayBuffer, const Array<shared_ptr<Surfel>>& surfelBuffer, Array<Color3>& modulationBuffer, const int j) const;
