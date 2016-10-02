@@ -7,16 +7,17 @@ class PathTracer {
         shared_ptr<TriTree> m_triangles;
         shared_ptr<Scene> m_scene;
         float m_lastTreeBuildTime;
+        int m_width;
 
         // Radiance3 measureLight(const Ray& ray, int numScatters) const;
         // Radiance3 shade(const Ray& ray, const shared_ptr<Surfel>& surfel) const;
         
         Radiance3 L_in(const Point3& X, const Vector3& w_in, int pathDepth, const TriTree& triArray) const; 
-        Radiance3 L_out(const shared_ptr<Surfel>& surfel, const Vector3& w_out, const Array<shared_ptr<Light>>& lights) const;
+        Radiance3 L_out(const shared_ptr<Surfel>& surfel, const Vector3& w_out, const Array<shared_ptr<Light>>& lights, const Point3& origin, const int j) const;
       
         bool isVisible(const Point3& X, const Point3& Y) const;
     
-        Radiance3 backgroundRadiance(const Vector3& direction) const; 
+        Radiance3 backgroundRadiance(const Vector3& direction, const Point3& origin, const int j) const; 
                 
         /*generate primary rays*/
         void generatePrimaryRays(Array<Ray>& rayBuffer,const shared_ptr<Camera>& cam, int width, int height, int j) const;
