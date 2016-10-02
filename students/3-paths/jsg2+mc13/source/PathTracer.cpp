@@ -9,7 +9,9 @@ void PathTracer::traceImage(const shared_ptr<Camera>& cam, const shared_ptr<Imag
     
     
     //Get the Array of lights
-    const Array<shared_ptr<Light>> lights(m_scene->lightingEnvironment().lightArray);
+    Array<shared_ptr<Light>> lights;
+    m_scene->getTypedEntityArray(lights);
+    //((m_scene->lightingEnvironment()).lightArray());
     //Make the tree
     Array<shared_ptr<Surface>> surfs;
     m_scene->onPose(surfs);
@@ -116,6 +118,7 @@ Radiance3 PathTracer::L_out(const shared_ptr<Surfel>& surfel, const Vector3& w_o
 };
 
 bool  PathTracer::isVisible(const Point3& X, const Point3& Y) const {
+    return true;
 };
 
 Radiance3  PathTracer::backgroundRadiance(const Vector3& direction, const Point3& origin, const int j) const {
@@ -148,11 +151,13 @@ void PathTracer::testVisibility(const Array<Ray>& shadowRayBuffer, const Array<s
 void PathTracer::computeShadowRays(Array<Ray>& shadowRayBuffer,  Array<Color3>& modulationBuffer, const Array<shared_ptr<Surfel>>& surfelBuffer, const Array<Radiance3>& biradianceBuffer, const Array<shared_ptr<Light>>& lights, const int j) const {
      const Point3& X(surfelBuffer[j]->position);
      int i(Random::threadCommon().uniform(0, lights.size()));
-     const Point3& Y (lights[i]->position.xyz());
+     const Point3& Y((lights[i]->position()).xyz());
      const Vector3& wo_y((X-Y).unit()); 
      const Point3& origin(Y*0.0001* sign((wo_y).dot(-surfelBuffer[j]->shadingNormal))); 
      shadowRayBuffer[j] = Ray(origin, wo_y);
      modulationBuffer[j] *= 1/lights.size();
 };
+
+PathTracer::~PathTracer(){};
 
 
