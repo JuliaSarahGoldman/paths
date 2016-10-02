@@ -4,7 +4,7 @@
 
 class PathTracer {
     protected:
-        shared_ptr<TriTree> m_triangles;
+        mutable TriTree m_triangles;
         shared_ptr<Scene> m_scene;
         float m_lastTreeBuildTime;
         int m_width;
