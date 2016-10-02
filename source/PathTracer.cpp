@@ -54,36 +54,22 @@ void PathTracer::traceImage(const shared_ptr<Camera>& cam, const shared_ptr<Imag
             Thread::runConcurrently(0, numPixels, [&](int j) {computeShadowRays(shadowRayBuffer, modulationBuffer, surfelBuffer, biradianceBuffer, lights, j); });
           //  Thread::runConcurrently(0, numPixels, [&](int j) {testVisibility(shadowRayBuffer, surfelBuffer, lightShadowedBuffer, j); });
             m_triangles.intersectRays(shadowRayBuffer, lightShadowedBuffer);
-            Thread::runConcurrently(0, numPixels, [&](int j) {writeToImage(shadowRayBuffer, biradianceBuffer, surfelBuffer, modulationBuffer, j, image, rayBuffer, lights); });
+            Thread::runConcurrently(0, numPixels, [&](int j) {writeToImage(shadowRayBuffer, biradianceBuffer, surfelBuffer, modulationBuffer, j, image, rayBuffer, lightShadowedBuffer); });
 
             if (d != m_maxScatters - 1) {
                 //set up for next loop
                 Thread::runConcurrently(0, numPixels, [&](int j) {generateRecursiveRays(rayBuffer, surfelBuffer, modulationBuffer, j); });
             }
-            /*  for(int j(0); j < numPixels; ++j){computeShadowRays(shadowRayBuffer,modulationBuffer, surfelBuffer, biradianceBuffer, lights, j); }
-           
-            if (d != m_maxScatters-1){
-               //set up for next loop
-              Thread::runConcurrently(0, numPixels, [&](int j){generateRecursiveRays(rayBuffer, surfelBuffer,modulationBuffer, j);});
-             }
-            /*  for(int j(0); j < numPixels; ++j){computeShadowRays(shadowRayBuffer,modulationBuffer, surfelBuffer, biradianceBuffer, lights, j); }    
-            for(int j(0); j < numPixels; ++j){testVisibility(shadowRayBuffer, surfelBuffer, lightShadowedBuffer, j); }    //casts shadow rays
-            // Increments image pixels -> by emissive and direct light, with importance sampling
-            for(int j(0); j < numPixels; ++j){writeToImage(shadowRayBuffer, biradianceBuffer, surfelBuffer, modulationBuffer, j, image, rayBuffer, lights);}
-            //Only if not last iteration.
-            if (d != m_maxScatters-1){
-                for(int j(0); j < numPixels; ++j){generateRecursiveRays(rayBuffer, surfelBuffer,modulationBuffer, j);}    //set up for next loop
-            }
-              */
+
         }
     }
 
 };
 
-void PathTracer::writeToImage(const Array<Ray>& shadowRayBuffer, const Array<Radiance3>& biradianceBuffer, const Array<shared_ptr<Surfel>>& surfelBuffer, const Array<Color3>& modulationBuffer, const int j, const shared_ptr<Image>& image, const Array<Ray>& rayBuffer, const Array<shared_ptr<Light>>& lights) const {
+void PathTracer::writeToImage(const Array<Ray>& shadowRayBuffer, const Array<Radiance3>& biradianceBuffer, const Array<shared_ptr<Surfel>>& surfelBuffer, const Array<Color3>& modulationBuffer, const int j, const shared_ptr<Image>& image, const Array<Ray>& rayBuffer, const Array<bool>& lightShadowedBuffer) const {
     Color3 current;
     image->get(Point2int32(j%image->width(), j / image->width()), current);
-    current += L_out(surfelBuffer[j], -rayBuffer[j].direction(), lights, rayBuffer[j].origin(), j);
+    current += L_out(surfelBuffer[j], shadowRayBuffer[j].origin(),-rayBuffer[j].direction(), biradianceBuffer[j],lightShadowedBuffer[j], rayBuffer[j].origin(), j);
     image->set(Point2int32(j%image->width(), j / image->width()), current);
 };
 
@@ -107,7 +93,7 @@ Radiance3 PathTracer::L_in(const Point3& X, const Vector3& w_in, int pathDepth, 
 
 };*/
 
-Radiance3 PathTracer::L_out(const shared_ptr<Surfel>& surfel, const Vector3& w_out, const Array<shared_ptr<Light>>& lights, const Point3& origin, const int j) const {
+Radiance3 PathTracer::L_out(const shared_ptr<Surfel>& surfel, const Point3& Y, const Vector3& w_out, const Radiance3& bi, bool notVisible, const Point3& origin, const int j) const {
     if (notNull(surfel)) {
         Radiance3 L(surfel->emittedRadiance(w_out)); // Emitted
 
@@ -116,18 +102,17 @@ Radiance3 PathTracer::L_out(const shared_ptr<Surfel>& surfel, const Vector3& w_o
         const Point3& X(surfel->position*.0001* sign((w_out).dot(n)));
 
         //Will be replaced with importance sampling
-        for (int i = 0; i < lights.size(); ++i) {
-            const shared_ptr<Light>& light(lights[i]);
-            const Point3& Y = light->position().xyz();
+ //       for (int i = 0; i < lights.size(); ++i) {
+ //           const shared_ptr<Light>& light(lights[i]);
+ //           const Point3& Y = light->position().xyz();
 
-            if (!light->castsShadows() || isVisible(X, Y)) {
+            if (!notVisible) {
                 const Vector3 w_in = (Y - X).direction();
-                Radiance3 Bi = light->biradiance(X);
 
                 const Radiance3 f = surfel->finiteScatteringDensity(w_in, -w_out);
-                L += Bi * f * abs(w_in.dot(n));
+                L += bi * f * abs(w_in.dot(n));
             }
-        }
+//        }
 
         /*Radiance3& indirectLight(Radiance3(0, 0, 0));
         if (m_maxScatters < pathDepth) {
@@ -186,7 +171,7 @@ void PathTracer::testVisibility(const Array<Ray>& shadowRayBuffer, const Array<s
 
 
 
-void PathTracer::computeShadowRays(Array<Ray>& shadowRayBuffer, Array<Color3>& modulationBuffer, const Array<shared_ptr<Surfel>>& surfelBuffer, const Array<Radiance3>& biradianceBuffer, const Array<shared_ptr<Light>>& lights, const int j) const {
+void PathTracer::computeShadowRays(Array<Ray>& shadowRayBuffer, Array<Color3>& modulationBuffer, const Array<shared_ptr<Surfel>>& surfelBuffer, Array<Radiance3>& biradianceBuffer, const Array<shared_ptr<Light>>& lights, const int j) const {
     if (!isNull(surfelBuffer[j])) {
         const Point3& X(surfelBuffer[j]->position);
         int i(Random::threadCommon().uniform(0, lights.size()));
@@ -196,6 +181,7 @@ void PathTracer::computeShadowRays(Array<Ray>& shadowRayBuffer, Array<Color3>& m
        // const Point3& origin(Y*0.0001* sign((wo_y).dot(-surfelBuffer[j]->shadingNormal)));
         shadowRayBuffer[j] = Ray::fromOriginAndDirection(Y, wo_y, 0.0001, maxDistance);
         modulationBuffer[j] *= 1 / lights.size();
+        biradianceBuffer[j] = lights[i]->biradiance(surfelBuffer[j]->position);
     }
     else {
         shadowRayBuffer[j] = Ray::fromOriginAndDirection(Point3(0, 0, 0), Vector3(1,1,1).unit(), 0.0001, 0.0002);
