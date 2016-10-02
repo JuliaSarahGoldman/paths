@@ -160,14 +160,35 @@ Radiance3  PathTracer::backgroundRadiance(const Vector3& direction, const Point3
 
 void PathTracer::computeShadowRays(Array<Ray>& shadowRayBuffer, Array<Color3>& modulationBuffer, const Array<shared_ptr<Surfel>>& surfelBuffer, Array<Radiance3>& biradianceBuffer, const Array<shared_ptr<Light>>& lights, const int j) const {
     if (!isNull(surfelBuffer[j])) {
+       
+        
         const Point3& X(surfelBuffer[j]->position);
+        int total(0);
+        for(int i(0); i< lights.size(); ++i){
+            total += lights[i]->biradiance(X).sum();
+        }
+
+        int counter(Random::threadCommon().uniform(0,total)); 
+        int index(0);
+        int i(0);
+
+        while(counter > 0 && i <lights.size()){
+            counter -= lights[i]->biradiance(X).sum();
+            if(counter < 0){
+                index = i;
+            }
+            ++i;
+        }
+        float weight((float)lights[index]->biradiance(X).sum()/(float)total); 
+        biradianceBuffer[j] = lights[index]->biradiance(X)*weight; 
+
         int i(Random::threadCommon().uniform(0, lights.size()));
         const Point3& Y((lights[i]->position()).xyz());
         const Vector3& wo_y((X - Y).unit());
         float  maxDistance((X - Y).length() - 0.0001);
        // const Point3& origin(Y*0.0001* sign((wo_y).dot(-surfelBuffer[j]->shadingNormal)));
         shadowRayBuffer[j] = Ray::fromOriginAndDirection(Y, wo_y, 0.0001, maxDistance);
-        modulationBuffer[j] *= 1 / lights.size();
+        modulationBuffer[j] *= weight;
         biradianceBuffer[j] = lights[i]->biradiance(surfelBuffer[j]->position);
     }
     else {
