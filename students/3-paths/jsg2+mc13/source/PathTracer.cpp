@@ -86,9 +86,14 @@ void PathTracer::writeToImage(const Array<Ray>& shadowRayBuffer, const Array<Rad
 void PathTracer::generateRecursiveRays(Array<Ray>& rayBuffer, const Array<shared_ptr<Surfel>>& surfelBuffer, Array<Color3>& modulationBuffer, const int j) const {
     Vector3 wo;
     Color3 weight;
-    surfelBuffer[j]->scatter(PathDirection::EYE_TO_SOURCE, rayBuffer[j].direction(), true, Random::threadCommon(), weight, wo);
-    rayBuffer[j] = Ray(surfelBuffer[j]->position, wo);
-    modulationBuffer[j] *= weight;
+    if (notNull(surfelBuffer[j])){
+        surfelBuffer[j]->scatter(PathDirection::EYE_TO_SOURCE, rayBuffer[j].direction(), true, Random::threadCommon(), weight, wo);
+        rayBuffer[j] = Ray(surfelBuffer[j]->position, wo);
+        modulationBuffer[j] *= weight;
+    }
+    else{
+        rayBuffer[j] = Ray::fromOriginAndDirection(Point3(0, 0, 0), Vector3(1,1,1).unit(), 0.0001, 0.0002);
+    }
 };
 
 //Don't use anymore
@@ -139,9 +144,7 @@ Radiance3 PathTracer::L_out(const shared_ptr<Surfel>& surfel, const Point3& Y, c
     }
 };
 
-bool  PathTracer::isVisible(const Point3& X, const Point3& Y) const {
-    return true;
-};
+
 
 Radiance3  PathTracer::backgroundRadiance(const Vector3& direction, const Point3& origin, const int j) const {
     Point2int32 p(origin.x, origin.y);
@@ -152,23 +155,6 @@ Radiance3  PathTracer::backgroundRadiance(const Vector3& direction, const Point3
 };
 
 
-
-void PathTracer::testVisibility(const Array<Ray>& shadowRayBuffer, const Array<shared_ptr<Surfel>>& surfelBuffer, Array<bool>& lightShadowedBuffer, const int j) const {
-    if (!isNull(surfelBuffer[j])) {
-        Point3 origin(shadowRayBuffer[j].origin());
-        Vector3 direction(shadowRayBuffer[j].direction());
-        Point3 X(surfelBuffer[j]->position);
-        float  maxDistance((X - origin).length() - 0.0001);
-        Ray shortRay(Ray::fromOriginAndDirection(origin, direction, 0.0001, maxDistance));
-        lightShadowedBuffer[j] = m_triangles.intersectRay(shortRay) == surfelBuffer[j];
-    } else { 
-        
-    };
-    /* shared_ptr<Surfel> other(m_triangles->intersectRay(shadowRayBuffer[j]));
-     Point3 toCheck(surfelBuffer[j]->position - other->position);
-     lightShadowedBuffer[j]= ((abs(toCheck.x) <= 0.0001) && (abs(toCheck.y) <= 0.0001) && (abs(toCheck.z) <= 0.0001));
-     */
-};
 
 
 
