@@ -41,8 +41,16 @@ void PathTracer::traceImage(const shared_ptr<Camera>& cam, const shared_ptr<Imag
         generatePrimaryRays(rayBuffer, cam, width, height, i);
         
         for(int d(0); d < m_maxScatters; ++d){
-            m_triangles->intersectRays(rayBuffer, surfelBuffer);   
-            for(int j(0); j < numPixels; ++j){computeShadowRays(shadowRayBuffer,modulationBuffer, surfelBuffer, biradianceBuffer, lights, j); }    
+            m_triangles->intersectRays(rayBuffer, surfelBuffer);
+            Thread::runConcurrently(0, numPixels, [&](int j){computeShadowRays(shadowRayBuffer,modulationBuffer, surfelBuffer, biradianceBuffer, lights, j);});
+            Thread::runConcurrently(0, numPixels, [&](int j){testVisibility(shadowRayBuffer, surfelBuffer, lightShadowedBuffer, j);});
+            Thread::runConcurrently(0, numPixels, [&](int j){writeToImage(shadowRayBuffer, biradianceBuffer, surfelBuffer, modulationBuffer, j, image, rayBuffer, lights);});
+            
+            if (d != m_maxScatters-1){
+               //set up for next loop
+              Thread::runConcurrently(0, numPixels, [&](int j){generateRecursiveRays(rayBuffer, surfelBuffer,modulationBuffer, j);});
+             }
+            /*  for(int j(0); j < numPixels; ++j){computeShadowRays(shadowRayBuffer,modulationBuffer, surfelBuffer, biradianceBuffer, lights, j); }    
             for(int j(0); j < numPixels; ++j){testVisibility(shadowRayBuffer, surfelBuffer, lightShadowedBuffer, j); }    //casts shadow rays
             // Increments image pixels -> by emissive and direct light, with importance sampling
             for(int j(0); j < numPixels; ++j){writeToImage(shadowRayBuffer, biradianceBuffer, surfelBuffer, modulationBuffer, j, image, rayBuffer, lights);}
@@ -50,7 +58,7 @@ void PathTracer::traceImage(const shared_ptr<Camera>& cam, const shared_ptr<Imag
             if (d != m_maxScatters-1){
                 for(int j(0); j < numPixels; ++j){generateRecursiveRays(rayBuffer, surfelBuffer,modulationBuffer, j);}    //set up for next loop
             }
-              
+              */
         }
     }
 
@@ -143,9 +151,17 @@ void PathTracer::generatePrimaryRays(Array<Ray>& rayBuffer,const shared_ptr<Came
 };
 
 void PathTracer::testVisibility(const Array<Ray>& shadowRayBuffer, const Array<shared_ptr<Surfel>>& surfelBuffer, Array<bool>& lightShadowedBuffer, const int j) const {
-  shared_ptr<Surfel> other(m_triangles->intersectRay(shadowRayBuffer[j])); 
+  Point3 origin(shadowRayBuffer[j].origin()); 
+  Vector3 direction(shadowRayBuffer[j].direction());
+  Point3 X(surfelBuffer[j]->position);
+  float  maxDistance((X-origin).length() - 0.0001);
+  Ray shortRay(Ray::fromOriginAndDirection(origin, direction, 0.0001, maxDistance));
+  lightShadowedBuffer[j] = m_triangles->intersectRay(shortRay) == surfelBuffer[j];
+  
+ /* shared_ptr<Surfel> other(m_triangles->intersectRay(shadowRayBuffer[j])); 
   Point3 toCheck(surfelBuffer[j]->position - other->position);
   lightShadowedBuffer[j]= ((abs(toCheck.x) <= 0.0001) && (abs(toCheck.y) <= 0.0001) && (abs(toCheck.z) <= 0.0001));
+  */
 }; 
 
 
