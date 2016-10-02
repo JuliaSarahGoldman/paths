@@ -182,14 +182,12 @@ void PathTracer::computeShadowRays(Array<Ray>& shadowRayBuffer, Array<Color3>& m
         float weight((float)lights[index]->biradiance(X).sum()/(float)total); 
         biradianceBuffer[j] = lights[index]->biradiance(X)*weight; 
 
-        int i(Random::threadCommon().uniform(0, lights.size()));
-        const Point3& Y((lights[i]->position()).xyz());
+        const Point3& Y((lights[index]->position()).xyz());
         const Vector3& wo_y((X - Y).unit());
         float  maxDistance((X - Y).length() - 0.0001);
        // const Point3& origin(Y*0.0001* sign((wo_y).dot(-surfelBuffer[j]->shadingNormal)));
         shadowRayBuffer[j] = Ray::fromOriginAndDirection(Y, wo_y, 0.0001, maxDistance);
         modulationBuffer[j] *= weight;
-        biradianceBuffer[j] = lights[i]->biradiance(surfelBuffer[j]->position);
     }
     else {
         shadowRayBuffer[j] = Ray::fromOriginAndDirection(Point3(0, 0, 0), Vector3(1,1,1).unit(), 0.0001, 0.0002);
