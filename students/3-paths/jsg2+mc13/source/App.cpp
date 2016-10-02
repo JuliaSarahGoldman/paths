@@ -270,7 +270,7 @@ void App::makeGUI() {
 
     GuiPane* pathTracePane = debugPane->addPane("Path Trace");
  
-    pathTracePane->setNewChildSize(240);
+    pathTracePane->setNewChildSize(500, -1, 300);
     GuiText temp("1x1");
     /*Array<GuiText> resolutionMenu(temp);
     temp = "320x200";
