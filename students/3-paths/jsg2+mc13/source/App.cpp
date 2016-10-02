@@ -221,7 +221,6 @@ void App::makeGlass(int slices){
 // automatically caught.
 void App::onInit() {
     GApp::onInit();
-    PathTracer tracer = PathTracer(scene());
     makeTriangles(1000);
     makeFountainPiece();
     makeSplash();
@@ -261,7 +260,7 @@ void App::makeTriangles(int numTris){
 }
 
 void App::makeGUI() {
-    PathTracer tracer(scene());
+    
 
     // Initialize the developer HUD
     createDeveloperHUD();
@@ -285,13 +284,15 @@ void App::makeGUI() {
     rayTracePane->addCheckBox("Multithreading",  &m_isMultithreaded, GuiTheme::NORMAL_CHECK_BOX_STYLE);
     } rayTracePane->endRow();*/
 
-    pathTracePane->addNumberBox("Light Transport Paths", &tracer.m_numPaths, " ppx", GuiTheme::LOG_SLIDER, 0, 2048) -> setUnitsSize(100);
-    pathTracePane->addNumberBox("Maximum Scatters", &tracer.m_maxScatters, "", GuiTheme::LOG_SLIDER, 0, 2048) -> setUnitsSize(100);
+    pathTracePane->addNumberBox("Light Transport Paths", &m_numPaths, " ppx", GuiTheme::LOG_SLIDER, 0, 2048) -> setUnitsSize(100);
+    pathTracePane->addNumberBox("Maximum Scatters", &m_maxScatters, "", GuiTheme::LOG_SLIDER, 0, 2048) -> setUnitsSize(100);
 
-    pathTracePane->addButton("Render", [this, pathTracePane, &tracer](){
+    pathTracePane->addButton("Render", [this, pathTracePane](){
+        
         drawMessage("Path Tracer is loading");
         shared_ptr<G3D::Image> image;
         try{
+            PathTracer tracer = PathTracer(scene(), m_numPaths, m_maxScatters);
             image = Image::create(50, 50, ImageFormat::RGB32F());          
             Stopwatch watch("watch");
             watch.tick();
@@ -300,13 +301,13 @@ void App::makeGUI() {
             debugPrintf(String(std::to_string(watch.smoothElapsedTime()) + " seconds").c_str());
             show(image, String(std::to_string(watch.smoothElapsedTime()) + " seconds + Numcores = " + std::to_string(G3D::System::numCores())));
             
-            const shared_ptr<Texture>& src = Texture::fromImage("Source", image);
+            /*const shared_ptr<Texture>& src = Texture::fromImage("Source", image);
             if (m_result) {
                 m_result->resize(image->width(), image->height());
             };
 
-            m_film->exposeAndRender(renderDevice, m_debugCamera->filmSettings(), src, settings().hdrFramebuffer.colorGuardBandThickness.x/* + settings().hdrFramebuffer.depthGuardBandThickness.x*/, settings().hdrFramebuffer.depthGuardBandThickness.x, m_result);
-            m_result->toImage()->save("result.png"); 
+            m_film->exposeAndRender(renderDevice, m_debugCamera->filmSettings(), src, settings().hdrFramebuffer.colorGuardBandThickness.x/ + settings().hdrFramebuffer.depthGuardBandThickness.x, settings().hdrFramebuffer.depthGuardBandThickness.x, m_result);
+            m_result->toImage()->save("result.png"); */
             
             ArticulatedModel::clearCache();
             

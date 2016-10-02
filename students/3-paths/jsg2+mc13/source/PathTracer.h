@@ -40,7 +40,7 @@ class PathTracer {
         int m_numPaths;
         int m_maxScatters;
 
-        PathTracer(const shared_ptr<Scene>& scene);
+        PathTracer(const shared_ptr<Scene>& scene, int numPaths, int maxScatters);
         ~PathTracer();
         void traceImage(const shared_ptr<Camera>& cam, const shared_ptr<Image>& image);
         
