@@ -2,8 +2,8 @@
 // Julia Goldman + Matheus de Carvalho Souza
 #include "PathTracer.h"
 
-PathTracer::PathTracer(const shared_ptr<Scene>& scene) :
-    m_scene(scene){
+PathTracer::PathTracer(const shared_ptr<Scene>& scene, int numPaths, int maxScatters) :
+    m_scene(scene), m_numPaths(numPaths), m_maxScatters(maxScatters){
 };
 
 void PathTracer::traceImage(const shared_ptr<Camera>& cam, const shared_ptr<Image>& image) {
@@ -17,6 +17,7 @@ void PathTracer::traceImage(const shared_ptr<Camera>& cam, const shared_ptr<Imag
     //Make the tree
     Array<shared_ptr<Surface>> surfs;
     m_scene->onPose(surfs);
+    m_triangles = shared_ptr<TriTree>(new TriTree());
     m_triangles->setContents(surfs);
 
     const int width(image->width());
@@ -28,14 +29,24 @@ void PathTracer::traceImage(const shared_ptr<Camera>& cam, const shared_ptr<Imag
     biradianceBuffer.resize(numPixels);
 
     Array<Color3> modulationBuffer;
+    modulationBuffer.resize(numPixels);
     for (int i(0); i < numPixels; ++i){
-        modulationBuffer.append(Color3(1/m_maxScatters));
+        if (m_maxScatters == 0){
+            modulationBuffer[i] = Color3(1,1,1);
+        }
+        else{
+            modulationBuffer[i] = Color3(1/m_maxScatters);
+        }
     }
 
     Array<Ray> rayBuffer;
-    Array<shared_ptr<Surfel>> surfelBuffer;   
+    rayBuffer.resize(numPixels);
+    Array<shared_ptr<Surfel>> surfelBuffer;  
+    surfelBuffer.resize(numPixels);
     Array<Ray> shadowRayBuffer;
+    shadowRayBuffer.resize(numPixels);
     Array<bool> lightShadowedBuffer;
+    lightShadowedBuffer.resize(numPixels);
 
     for (int i(0); i < m_numPaths; ++i){
         generatePrimaryRays(rayBuffer, cam, width, height, i);

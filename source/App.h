@@ -20,6 +20,8 @@ protected:
     float m_height;
     int m_slices;
     String m_heightfieldSource;
+    int m_numPaths;
+    int m_maxScatters;
     /** Allocated by expose and render */
     shared_ptr<Texture> m_result;
     /** Called from onInit */
