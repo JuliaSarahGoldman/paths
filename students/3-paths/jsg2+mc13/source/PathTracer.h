@@ -20,7 +20,7 @@ class PathTracer {
         Radiance3 backgroundRadiance(const Vector3& direction, const Point3& origin, const int j) const; 
                 
         /*generate primary rays*/
-        void generatePrimaryRays(Array<Ray>& rayBuffer,const shared_ptr<Camera>& cam, int width, int height, int j) const;
+        void generatePrimaryRays(Array<Ray>& rayBuffer,const shared_ptr<Camera>& cam, int width, int height) const;
       
         /*choose which light to sample, measuring biradiance and
                    computing a shadow ray*/

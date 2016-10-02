@@ -47,12 +47,14 @@ void PathTracer::traceImage(const shared_ptr<Camera>& cam, const shared_ptr<Imag
     lightShadowedBuffer.resize(numPixels);
 
     for (int i(0); i < m_numPaths; ++i) {
-        generatePrimaryRays(rayBuffer, cam, width, height, i);
+        
+
+        generatePrimaryRays(rayBuffer, cam, width, height);
+
 
         for (int d(0); d < m_maxScatters; ++d) {
             m_triangles.intersectRays(rayBuffer, surfelBuffer);
             Thread::runConcurrently(0, numPixels, [&](int j) {computeShadowRays(shadowRayBuffer, modulationBuffer, surfelBuffer, biradianceBuffer, lights, j); });
-          //  Thread::runConcurrently(0, numPixels, [&](int j) {testVisibility(shadowRayBuffer, surfelBuffer, lightShadowedBuffer, j); });
             m_triangles.intersectRays(shadowRayBuffer, lightShadowedBuffer);
             Thread::runConcurrently(0, numPixels, [&](int j) {writeToImage(shadowRayBuffer, biradianceBuffer, surfelBuffer, modulationBuffer, j, image, rayBuffer, lightShadowedBuffer); });
 
@@ -65,6 +67,14 @@ void PathTracer::traceImage(const shared_ptr<Camera>& cam, const shared_ptr<Imag
     }
 
 };
+
+void PathTracer::generatePrimaryRays(Array<Ray>& rayBuffer, const shared_ptr<Camera>& cam, int width, int height) const {
+    Rect2D plane(Rect2D(Vector2(width, height)));
+    Thread::runConcurrently(Point2int32(0,0),Point2int32(width, height), [&](Point2int32 pixel) {
+        Ray ray(cam->worldRay(pixel.x, pixel.y, plane));
+        rayBuffer[pixel.x+pixel.y*width] = ray; 
+    });
+  };
 
 void PathTracer::writeToImage(const Array<Ray>& shadowRayBuffer, const Array<Radiance3>& biradianceBuffer, const Array<shared_ptr<Surfel>>& surfelBuffer, const Array<Color3>& modulationBuffer, const int j, const shared_ptr<Image>& image, const Array<Ray>& rayBuffer, const Array<bool>& lightShadowedBuffer) const {
     Color3 current;
@@ -141,16 +151,7 @@ Radiance3  PathTracer::backgroundRadiance(const Vector3& direction, const Point3
     return picCol;
 };
 
-void PathTracer::generatePrimaryRays(Array<Ray>& rayBuffer, const shared_ptr<Camera>& cam, int width, int height, int j) const {
-    Rect2D plane(Rect2D(Vector2(width, height)));
 
-    for (int y(0); y < height; ++y) {
-        for (int x(0); x < width; ++x) {
-            Ray ray(cam->worldRay(x, y, plane));
-            rayBuffer[j] = ray;
-        }
-    }
-};
 
 void PathTracer::testVisibility(const Array<Ray>& shadowRayBuffer, const Array<shared_ptr<Surfel>>& surfelBuffer, Array<bool>& lightShadowedBuffer, const int j) const {
     if (!isNull(surfelBuffer[j])) {
