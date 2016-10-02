@@ -84,11 +84,11 @@ void PathTracer::writeToImage(const Array<Ray>& shadowRayBuffer, const Array<Rad
 };
 
 void PathTracer::generateRecursiveRays(Array<Ray>& rayBuffer, const Array<shared_ptr<Surfel>>& surfelBuffer, Array<Color3>& modulationBuffer, const int j) const {
-    Vector3 wo;
+    Vector3 win;
     Color3 weight;
     if (notNull(surfelBuffer[j])){
-        surfelBuffer[j]->scatter(PathDirection::EYE_TO_SOURCE, rayBuffer[j].direction(), true, Random::threadCommon(), weight, wo);
-        rayBuffer[j] = Ray(surfelBuffer[j]->position, wo);
+        surfelBuffer[j]->scatter(PathDirection::EYE_TO_SOURCE, -rayBuffer[j].direction(), false, Random::threadCommon(), weight, win);
+        rayBuffer[j] = Ray(surfelBuffer[j]->position, win);
         modulationBuffer[j] *= weight;
     }
     else{
