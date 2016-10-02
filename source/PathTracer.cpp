@@ -80,7 +80,7 @@ Radiance3 PathTracer::L_in(const Point3& X, const Vector3& w_in, int pathDepth, 
 
 Radiance3 PathTracer::L_out(const shared_ptr<Surfel>& surfel, const Vector3& w_out, const Array<shared_ptr<Light>>& lights, const Point3& origin, const int j) const {
     if (notNull(surfel)) {
-        const Radiance3& L(surfel->emittedRadiance); // Emitted
+        Radiance3 L(surfel->emittedRadiance(w_out)); // Emitted
 
         const Vector3& n(surfel->shadingNormal);
         //const Vector3& w_in(Vector3::cosHemiRandom(n, Random::threadCommon()));
@@ -92,10 +92,10 @@ Radiance3 PathTracer::L_out(const shared_ptr<Surfel>& surfel, const Vector3& w_o
             const Point3& Y = light->position().xyz();
 
             if (!light->castsShadows() || isVisible(X, Y)) {
-                const Vector3& w_in = (Y - X).direction();
-                Biradiance3& Bi = light->biradiance(X);
+                const Vector3 w_in = (Y - X).direction();
+                Radiance3 Bi = light->biradiance(X);
 
-                const Color3& f = surfel->finiteScatteringDensity(w_in, -w_out);
+                const Radiance3 f = surfel->finiteScatteringDensity(w_in, -w_out);
                 L += Bi * f * abs(w_in.dot(n));
             }
         }
