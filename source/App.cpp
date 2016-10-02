@@ -261,7 +261,7 @@ void App::makeTriangles(int numTris){
 }
 
 void App::makeGUI() {
-    PathTracer tracer = PathTracer(scene());
+    PathTracer tracer(scene());
 
     // Initialize the developer HUD
     createDeveloperHUD();

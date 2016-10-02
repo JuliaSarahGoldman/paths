@@ -2,7 +2,9 @@
 // Julia Goldman + Matheus de Carvalho Souza
 #include "PathTracer.h"
 
-PathTracer::PathTracer(const shared_ptr<Scene>& scene) {};
+PathTracer::PathTracer(const shared_ptr<Scene>& scene) :
+    m_scene(scene){
+};
 
 void PathTracer::traceImage(const shared_ptr<Camera>& cam, const shared_ptr<Image>& image) {
    
