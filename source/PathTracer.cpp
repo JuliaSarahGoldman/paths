@@ -16,6 +16,7 @@ void PathTracer::traceImage(const shared_ptr<Camera>& cam, const shared_ptr<Imag
     m_triangles->setContents(surfs);
 
     const int width(image->width());
+    m_width = width;
     const int height(image->height());
     const int& numPixels(width*height);
   
@@ -42,8 +43,9 @@ void PathTracer::traceImage(const shared_ptr<Camera>& cam, const shared_ptr<Imag
             // Increments image pixels -> by emissive and direct light, with importance sampling
             for(int j(0); j < numPixels; ++j){writeToImage(shadowRayBuffer, biradianceBuffer, surfelBuffer, modulationBuffer, j, image, rayBuffer, lights);}
             //Only if not last iteration.
-            for(int j(0); j < numPixels; ++j){generateRecursiveRays(rayBuffer, surfelBuffer,modulationBuffer, j);}    //set up for next loop
-           // for(int j(0); j < numPixels; ++j){updateModulation(modulationBuffer, rayBuffer, j);}    
+            if (d != m_maxScatters-1){
+                for(int j(0); j < numPixels; ++j){generateRecursiveRays(rayBuffer, surfelBuffer,modulationBuffer, j);}    //set up for next loop
+            }
               
         }
     }
@@ -53,7 +55,7 @@ void PathTracer::traceImage(const shared_ptr<Camera>& cam, const shared_ptr<Imag
 void PathTracer::writeToImage(const Array<Ray>& shadowRayBuffer, const Array<Radiance3>& biradianceBuffer, const Array<shared_ptr<Surfel>>& surfelBuffer, const Array<Color3>& modulationBuffer, const int j, const shared_ptr<Image>& image, const Array<Ray>& rayBuffer, const Array<shared_ptr<Light>>& lights) const{
     Color3 current;
     image->get(Point2int32(j%image->width(), j/image->width()), current);
-    current += L_out(surfelBuffer[j], -rayBuffer[j].direction(), lights);
+    current += L_out(surfelBuffer[j], -rayBuffer[j].direction(), lights, rayBuffer[j].origin(), j);
     image->set(Point2int32(j%image->width(), j/image->width()), current);
 };
 
@@ -76,7 +78,7 @@ Radiance3 PathTracer::L_in(const Point3& X, const Vector3& w_in, int pathDepth, 
 
 };
 
-Radiance3 PathTracer::L_out(const shared_ptr<Surfel>& surfel, const Vector3& w_out, const Array<shared_ptr<Light>>& lights) const {
+Radiance3 PathTracer::L_out(const shared_ptr<Surfel>& surfel, const Vector3& w_out, const Array<shared_ptr<Light>>& lights, const Point3& origin, const int j) const {
     if (notNull(surfel)) {
         const Radiance3& L(surfel->emittedRadiance); // Emitted
 
@@ -109,15 +111,19 @@ Radiance3 PathTracer::L_out(const shared_ptr<Surfel>& surfel, const Vector3& w_o
 
     }
     else {
-        return backgroundRadiance(w_out);
+        return backgroundRadiance(w_out, origin, j);
     }
 };
 
 bool  PathTracer::isVisible(const Point3& X, const Point3& Y) const {
 };
 
-Radiance3  PathTracer::backgroundRadiance(const Vector3& direction) const {
-    return Radiance3(0,0,0);
+Radiance3  PathTracer::backgroundRadiance(const Vector3& direction, const Point3& origin, const int j) const {
+    Point2int32 p(origin.x,origin.y);
+    Radiance3 picCol(0.0f,0.75f,1.0f);
+    float dis(sqrt(abs((p.x-(j%m_width))*(p.x-(j%m_width))+(p.y-(j/m_width))*(p.y-(j/m_width)))));
+    picCol *= (dis>1) ? abs( 1/dis * 100 * direction.dot(Vector3(0.04f,0.5f,0.03f))) : abs(dis * direction.dot(Vector3(0.04f,0.5f,0.03f)) * 100);
+    return picCol;
 };
 
 void PathTracer::generatePrimaryRays(Array<Ray>& rayBuffer,const shared_ptr<Camera>& cam, int width, int height, int j) const {
