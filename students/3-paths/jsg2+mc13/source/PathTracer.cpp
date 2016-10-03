@@ -1,5 +1,10 @@
 /** \file RayTracer.cpp */
-// Julia Goldman + Matheus de Carvalho Souza
+/*
+  Julia Goldman
+  Matheus de Carvalho Souza
+  Jose Rivas-Garcia
+  Youle Chen
+  */
 #include "PathTracer.h"
 
 PathTracer::PathTracer(const shared_ptr<Scene>& scene, int numPaths, int maxScatters) :

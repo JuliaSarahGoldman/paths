@@ -4,6 +4,11 @@
   The G3D 10.00 default starter app is configured for OpenGL 4.1 and
   relatively recent GPUs.
  */
+/*  Julia Goldman
+  Matheus de Carvalho Souza
+  Jose Rivas-Garcia
+  Youle Chen
+  */
 #pragma once
 #include <G3D/G3DAll.h>
 
