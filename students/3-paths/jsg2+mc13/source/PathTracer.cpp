@@ -78,7 +78,7 @@ void PathTracer::writeToImage(const Array<Ray>& shadowRayBuffer, const Array<Rad
     Color3 current;
     //image->get(Point2int32(j%image->width(), j / image->width()), current);
     //Should apply the modulation buffer here, but just turns black
-    current = modulationBuffer[j]*L_out(surfelBuffer[j], shadowRayBuffer[j].origin(),-rayBuffer[j].direction(), biradianceBuffer[j],lightShadowedBuffer[j], rayBuffer[j].origin(), j);
+    current = L_out(surfelBuffer[j], shadowRayBuffer[j].origin(),-rayBuffer[j].direction(), biradianceBuffer[j],lightShadowedBuffer[j], rayBuffer[j].origin(), j);
     //image->set(Point2int32(j%image->width(), j / image->width()), current);
 
     image->increment(Point2int32(j%image->width(), j / image->width()), current);
@@ -176,13 +176,12 @@ void PathTracer::computeShadowRays(Array<Ray>& shadowRayBuffer, Array<Color3>& m
 
         while(counter > 0 && i <lights.size()){
             counter -= lights[i]->biradiance(X).sum();
-            if(counter < 0){
-                index = i;
-            }
+
+            index = i;
             ++i;
         }
         float weight((float)lights[index]->biradiance(X).sum()/(float)total); 
-        biradianceBuffer[j] = lights[index]->biradiance(X)*weight; 
+        biradianceBuffer[j] = lights[index]->biradiance(X)/weight; 
 
         const Point3& Y((lights[index]->position()).xyz());
         const Vector3& wo_y((X - Y).unit());
