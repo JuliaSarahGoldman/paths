@@ -76,9 +76,9 @@ void PathTracer::generatePrimaryRays(Array<Ray>& rayBuffer, const shared_ptr<Cam
 
 void PathTracer::writeToImage(const Array<Ray>& shadowRayBuffer, const Array<Radiance3>& biradianceBuffer, const Array<shared_ptr<Surfel>>& surfelBuffer, const Array<Color3>& modulationBuffer, const int j, const shared_ptr<Image>& image, const Array<Ray>& rayBuffer, const Array<bool>& lightShadowedBuffer) const {
     Color3 current;
-    image->get(Point2int32(j%image->width(), j / image->width()), current);
+    image->get(Point2int32(j%image->width(), j / image->width()), current); 
     //Should apply the modulation buffer here, but just turns black
-    current = L_out(surfelBuffer[j], shadowRayBuffer[j].origin(),-rayBuffer[j].direction(), biradianceBuffer[j],lightShadowedBuffer[j], rayBuffer[j].origin(), j);
+    current += modulationBuffer[j]*L_out(surfelBuffer[j], shadowRayBuffer[j].origin(),-rayBuffer[j].direction(), biradianceBuffer[j],lightShadowedBuffer[j], rayBuffer[j].origin(), j);
     image->set(Point2int32(j%image->width(), j / image->width()), current);
 
     //image->increment(Point2int32(j%image->width(), j / image->width()), current);
@@ -126,7 +126,7 @@ Radiance3 PathTracer::L_out(const shared_ptr<Surfel>& surfel, const Point3& Y, c
             if (!notVisible) {
                 const Vector3 w_in = (Y - X).direction();
 
-                const Radiance3 f = surfel->finiteScatteringDensity(w_in, -w_out);
+                const Radiance3 f = surfel->finiteScatteringDensity(w_in, w_out);
                 L += bi * f * abs(w_in.dot(n));
             }
 //        }
