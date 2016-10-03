@@ -1,4 +1,11 @@
-/** \file App.cpp */
+/** \file App.cpp 
+
+  */
+/*  Julia Goldman
+  Matheus de Carvalho Souza
+  Jose Rivas-Garcia
+  Youle Chen
+  */
 #include "App.h"
 #include "PathTracer.h"
 // Tells C++ to invoke command-line main() function even on OS X and Win32.
@@ -282,7 +289,7 @@ void App::makeGUI() {
         shared_ptr<G3D::Image> image;
         try{
             PathTracer tracer = PathTracer(scene(), m_numPaths, m_maxScatters);
-            image = Image::create(1280, 720, ImageFormat::RGB32F());          
+            image = Image::create(640, 400, ImageFormat::RGB32F());          
             Stopwatch watch("watch");
             watch.tick();
             tracer.traceImage(activeCamera(), image);
