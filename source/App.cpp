@@ -282,7 +282,7 @@ void App::makeGUI() {
         shared_ptr<G3D::Image> image;
         try{
             PathTracer tracer = PathTracer(scene(), m_numPaths, m_maxScatters);
-            image = Image::create(320, 200, ImageFormat::RGB32F());          
+            image = Image::create(1280, 720, ImageFormat::RGB32F());          
             Stopwatch watch("watch");
             watch.tick();
             tracer.traceImage(activeCamera(), image);
