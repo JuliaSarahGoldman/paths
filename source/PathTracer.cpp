@@ -15,7 +15,7 @@ void PathTracer::traceImage(const shared_ptr<Camera>& cam, const shared_ptr<Imag
     //Get the Array of lights
     Array<shared_ptr<Light>> lights;
     m_scene->getTypedEntityArray(lights);
-    //((m_scene->lightingEnvironment()).lightArray());
+    
     //Make the tree
     m_triangles.setContents(m_scene);
 
@@ -33,10 +33,13 @@ void PathTracer::traceImage(const shared_ptr<Camera>& cam, const shared_ptr<Imag
 
     Array<Ray> rayBuffer;
     rayBuffer.resize(numPixels);
+
     Array<shared_ptr<Surfel>> surfelBuffer;
     surfelBuffer.resize(numPixels);
+
     Array<Ray> shadowRayBuffer;
     shadowRayBuffer.resize(numPixels);
+
     Array<bool> lightShadowedBuffer;
     lightShadowedBuffer.resize(numPixels);
 
@@ -81,8 +84,6 @@ void PathTracer::writeToImage(const Array<Ray>& shadowRayBuffer, const Array<Rad
     //Should apply the modulation buffer here, but just turns black
     current += modulationBuffer[j]*L_out(surfelBuffer[j], shadowRayBuffer[j].origin(),-rayBuffer[j].direction(), biradianceBuffer[j],lightShadowedBuffer[j], rayBuffer[j].origin(), j);
     image->set(Point2int32(j%image->width(), j / image->width()), current);
-
-    //image->increment(Point2int32(j%image->width(), j / image->width()), current);
 };
 
 void PathTracer::generateRecursiveRays(Array<Ray>& rayBuffer, const Array<shared_ptr<Surfel>>& surfelBuffer, Array<Color3>& modulationBuffer, const int j) const {
@@ -102,7 +103,7 @@ void PathTracer::generateRecursiveRays(Array<Ray>& rayBuffer, const Array<shared
 
 Radiance3 PathTracer::L_out(const shared_ptr<Surfel>& surfel, const Point3& Y, const Vector3& w_out, const Radiance3& bi, bool notVisible, const Point3& origin, const int j) const {
     if (notNull(surfel)) {
-        Radiance3 L(surfel->emittedRadiance(w_out)); // Emitted
+        Radiance3 L(surfel->emittedRadiance(w_out)); 
 
         const Vector3& n(surfel->shadingNormal);
         const Point3& X(surfel->position);
@@ -125,7 +126,6 @@ Radiance3 PathTracer::L_out(const shared_ptr<Surfel>& surfel, const Point3& Y, c
 
 
 Radiance3  PathTracer::backgroundRadiance(const Vector3& direction, const Point3& origin, const int j) const {
-    //return Radiance3(.5,.5,.5); //Prevents sky color from having too much effect
     Point2int32 p(origin.x, origin.y);
     Radiance3 picCol(0.0f, 0.75f, 1.0f);
     float dis(sqrt(abs((p.x - (j%m_width))*(p.x - (j%m_width)) + (p.y - (j / m_width))*(p.y - (j / m_width)))));
