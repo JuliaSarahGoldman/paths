@@ -6,6 +6,8 @@
 
 Design
 ======================================================
+We have a [PathTracer]() class, which keeps a TriTree of all the triangles in the scene as state, as well as all the specifications passed in through the GUI. To trace an image, the user calls [traceImage](), providing a camera and an image. Trace image has two main for loops, one within the other. The outer loops in the number of paths. It will [generatePrimaryRays]() in a buffer for each one, and sets the modulation buffer to 1/(the number of rays). Then within the for loop, we loop in the number of scattering events. We fill our surfel buffer with the surfel hit by the primary ray of each pixel. Then, we [computeShadowRays]() for each pixel in parallel. In doing so, we.. Then, we fill our shadowRayBuffer by attempting to intersect our shadow rays with closer surfels, determining whether or not a shadow in cast. Having determined that, we [writeToImage] in parallel. In doing that, we
+
 
 Results
 ======================================================
