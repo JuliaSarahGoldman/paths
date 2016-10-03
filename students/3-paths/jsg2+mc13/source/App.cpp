@@ -301,19 +301,19 @@ void App::makeGUI() {
             debugPrintf(String(std::to_string(watch.smoothElapsedTime()) + " seconds").c_str());
             show(image, String(std::to_string(watch.smoothElapsedTime()) + " seconds + Numcores = " + std::to_string(G3D::System::numCores())));
             
-            /*const shared_ptr<Texture>& src = Texture::fromImage("Source", image);
+            const shared_ptr<Texture>& src = Texture::fromImage("Source", image);
             if (m_result) {
                 m_result->resize(image->width(), image->height());
             };
 
-            m_film->exposeAndRender(renderDevice, m_debugCamera->filmSettings(), src, settings().hdrFramebuffer.colorGuardBandThickness.x/ + settings().hdrFramebuffer.depthGuardBandThickness.x, settings().hdrFramebuffer.depthGuardBandThickness.x, m_result);
-            m_result->toImage()->save("result.png"); */
+            m_film->exposeAndRender(renderDevice, activeCamera()->filmSettings(), src,0, 0, m_result);
+            m_result->toImage()->save("result.png");
             
-            ArticulatedModel::clearCache();
+            //ArticulatedModel::clearCache();
             
             //loadScene(developerWindow->sceneEditorWindow->selectedSceneName());
         }catch(...){
-            msgBox("Unable to load the image.", m_heightfieldSource);
+            msgBox("Unable to load the image.");
         }
     });
 
