@@ -4,6 +4,11 @@
                jsg2@williams.edu             
                mc13@williams.edu           
 
+2016-10-03: Finishing Up
+=============================================================
+
+Generated images and worked on report.
+
 2016-10-03: Demonstration
 =============================================================
 
@@ -16,8 +21,11 @@
 2016-10-02: 100 paths, 100 scatters
 =============================================================
 
+Left lab around midnight.
+
 ![](2016-10-02_041_3-paths_r1281_g3d_r875___.png)
 
+We fixed the black spots. We realized that when we sampled lights, sometimes our weights resulted in a biradiance of Not A Number, and we added if statements to account fot his case.
 
 
 2016-10-02: Mirror Balls
@@ -25,12 +33,14 @@
 
 ![](2016-10-02_040_3-paths_r1281_g3d_r875___.png)
 
+Annoying black spots are appearing when we use indirect light.
+
 
 
 2016-10-02: better modulation
 =============================================================
 
-![0 for null surfels](2016-10-02_039_3-paths_r1280_g3d_r875___0_for_null_surfels.png)
+![Null surfels should be 0](2016-10-02_039_3-paths_r1280_g3d_r875___0_for_null_surfels.png)
 
 
 
@@ -46,12 +56,18 @@
 
 ![](2016-10-02_037_3-paths_r1277_g3d_r875___.png)
 
+A little scattering's okay.
+
 
 
 2016-10-02: 1000 Paths
 =============================================================
 
 ![](2016-10-02_036_3-paths_r1277_g3d_r875___.png)
+
+Fixed old ray bumping to get rid of black spots in direct light.
+
+We realized that we were setting rather than incrementing pixels due to a typo, thus all the darkness. Now, applying modulation works.
 
 
 
@@ -62,28 +78,31 @@
 
 
 
+
 2016-10-02: 1000 paths
 =============================================================
 
-![](2016-10-02_034_3-paths_r1274_g3d_r875___.png)
+![Modulation?](2016-10-02_034_3-paths_r1274_g3d_r875___.png)
 
 
 
 2016-10-02: Scattering
 =============================================================
 
-![](2016-10-02_033_3-paths_r1268_g3d_r875___.png)
+![But we need to modulate for scattering...](2016-10-02_033_3-paths_r1268_g3d_r875___.png)
 
 
 
 2016-10-02: Brighter
 =============================================================
 
-![](2016-10-02_032_3-paths_r1268_g3d_r875___.png)
+![No modulation](2016-10-02_032_3-paths_r1268_g3d_r875___.png)
+
+Mysterious black specks now appearing.
 
 
 
-2016-10-02: ???
+2016-10-02: Darker
 =============================================================
 
 ![](2016-10-02_031_3-paths_r1268_g3d_r875___.png)
@@ -107,7 +126,9 @@
 2016-10-02: Modulation
 =============================================================
 
-![Applying the modulation Buffer](2016-10-02_028_3-paths_r1253_g3d_r875___Applying_the_modulation_Buffer.png)
+![Finally applying the modulation Buffer](2016-10-02_028_3-paths_r1253_g3d_r875___Applying_the_modulation_Buffer.png)
+
+Again, inexplicable darkness.
 
 
 
@@ -118,10 +139,10 @@
 
 
 
-2016-10-02: Sactter Twice
+2016-10-02: Scatter Twice
 =============================================================
 
-![We definitely gte less light when we scatter.](2016-10-02_026_3-paths_r1253_g3d_r875__We_definitely_gte_less_light_when_we_scatter..jpg)
+![We definitely get less light when we scatter.](2016-10-02_026_3-paths_r1253_g3d_r875__We_definitely_gte_less_light_when_we_scatter..jpg)
 
 
 
@@ -130,9 +151,11 @@
 
 ![](2016-10-02_025_3-paths_r1253_g3d_r875___.png)
 
+Why so much darkness? Scattering should not make the image darker.
 
 
-2016-10-02: 1000 paths
+
+2016-10-02: 1000 paths, no scattering
 =============================================================
 
 ![](2016-10-02_024_3-paths_r1253_g3d_r875___.png)
@@ -142,7 +165,7 @@
 2016-10-02: Also strange.
 =============================================================
 
-![](2016-10-02_023_3-paths_r1253_g3d_r875___.png)
+![Last week's custom scne with scattering.](2016-10-02_023_3-paths_r1253_g3d_r875___.png)
 
 
 
@@ -158,12 +181,15 @@
 
 ![](2016-10-02_021_3-paths_r1253_g3d_r875__.jpg)
 
+With more paths we start to get weird circles.
 
 
 2016-10-02: Dark
 =============================================================
 
 ![](2016-10-02_020_3-paths_r1253_g3d_r875___.png)
+
+Attempted rendering spheres for the first time. Dark and imprecise.
 
 
 
@@ -172,6 +198,7 @@
 
 ![Scattering](2016-10-02_019_3-paths_r1253_g3d_r875___Scattering.png)
 
+Direct might be close to good, but scattering is odd.
 
 
 2016-10-02: Not bad... 8:10 pm
@@ -184,7 +211,8 @@
 2016-10-02: Sponza with 100 paths
 =============================================================
 
-![](2016-10-02_017_3-paths_r1253_g3d_r875___.png)
+![Really bright.](2016-10-02_017_3-paths_r1253_g3d_r875___.png)
+(This is because we were not actually applying the modulation buffer.)
 
 
 
@@ -193,6 +221,8 @@
 
 ![Too bright](2016-10-02_016_3-paths_r1253_g3d_r875___Too_bright.png)
 
+When we add more paths, Sponza gets really bright.
+
 
 
 2016-10-02: Black Sky
@@ -200,12 +230,13 @@
 
 ![If the sky's black, too dark](2016-10-02_015_3-paths_r1253_g3d_r875__If_the_sky_s_black__too_dark.jpg)
 
+We attempted to make ths ky black to combat this problem. We then realized that this was having no real effect.
 
 
 2016-10-02: Too much blue
 =============================================================
 
-![](2016-10-02_014_3-paths_r1253_g3d_r875___.png)
+![Again, the sky creeps in.](2016-10-02_014_3-paths_r1253_g3d_r875___.png)
 
 
 
@@ -221,8 +252,9 @@
 2016-10-02: Sponza
 =============================================================
 
-![](2016-10-02_011_3-paths_r1253_g3d_r875___.png)
+![Sponza with no scattering.](2016-10-02_011_3-paths_r1253_g3d_r875___.png)
 
+We can generate Sponza really quickly though.
 
 
 2016-10-02: Bad indirect
@@ -234,6 +266,7 @@
 
 2016-10-02: Scatter
 =============================================================
+Scattering still far too blue.
 
 ![Where'd the colors go?](2016-10-02_009_3-paths_r1253_g3d_r875__Where_d_the_colors_go_.jpg)
 
@@ -241,7 +274,7 @@
 
 2016-10-02: Modulation?
 =============================================================
-Tried more paths
+Tried generating image with more paths.
 
 ![Still weird](2016-10-02_008_3-paths_r1253_g3d_r875__Still_weird.jpg)
 
@@ -259,34 +292,38 @@ Returned from dinner 7:50. Working minimally for the moment.
 =============================================================
 Went to dinner at 7.
 
-![Fixed wrong direction](2016-10-02_006_3-paths_r1246_g3d_r875__Fixed_wrong_direction.jpg)
+![Made sure rays in the wrong direction](2016-10-02_006_3-paths_r1246_g3d_r875__Fixed_wrong_direction.jpg)
 
 ![A lot of blue](2016-10-02_005_3-paths_r1245_g3d_r875__A_lot_of_blue.jpg)
 
 ![Dark Cornell Box](2016-10-02_006_3-paths_r1249_g3d_r875___Dark_Cornell_Box.png)
 
-with light sampling
+We attempted light sampling, but now everything is very dark.
 
 
 
-2016-10-02:
+2016-10-02: More Failed Scattering
 =============================================================
 
 ![A lot of blue](2016-10-02_005_3-paths_r1245_g3d_r875__A_lot_of_blue.jpg)
 
 
 
-2016-10-02:
+2016-10-02: Failed Scattering
 =============================================================
 
 ![A lot of blue](2016-10-02_005_3-paths_r1245_g3d_r875__A_lot_of_blue.jpg)
 
+When attempting scattering, our sky color creeps in unduly.
 
 
-2016-10-02: First trianglwith direct light
+
+2016-10-02: First triangle with direct light
 =============================================================
 
 ![Triangle, random direct light](2016-10-02_004_3-paths_r1238_g3d_r875__Triangle__random_direct_light.jpg)
+
+We currently choose a light at random rather than sampling.
 
 
 
@@ -295,7 +332,7 @@ with light sampling
 
 ![silhouettes!!](2016-10-02_003_3-paths_r1238_g3d_r875___silhouettes__.png)
 
-We realized that we were giving our function for getting the primary rays incorrect indices of pixels, preventing it from
+We realized that we were giving our function for getting the primary rays incorrect indices of pixels, preventing the rays from being generated and stored correctly.
 
 
 
@@ -333,7 +370,7 @@ Arrived 3 pm.
 
 Currently 5:35 pm. Implementing functions in parallel. Have realized we should not worry about light sampling right away. Currently have implementations for generatePrimaryRays, writeToImage, and generateRecursiveRays. In the process of implementing testVisibility. Then, we'll move to actually calculating the shadow rays.
 
-Arrived 2 pm. Struggle to relate pseudo code from lab with python code from lecture notes. Began writing traceImage to determine whetehr we actually had the helper functions we needed with the correct parameters and return values. Determined from this that we had not organized our helper functions properly, and attempted to reorganize. It is now 3:35 pm.
+Arrived 2 pm. Struggle to relate pseudo code from lab with python code from lecture notes. Began writing traceImage to determine whether we actually had the helper functions we needed with the correct parameters and return values. Determined from this that we had not organized our helper functions properly, and attempted to reorganize. It is now 3:35 pm.
 
 2016-09-29: Scheduled Lab Period
 ====================================================================
