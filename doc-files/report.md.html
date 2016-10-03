@@ -6,7 +6,7 @@
 
 Design
 ======================================================
-We have a [PathTracer]() class, which keeps a TriTree of all the triangles in the scene as state, as well as all the specifications passed in through the GUI. To trace an image, the user calls [traceImage](), providing a camera and an image. Trace image has two main for loops, one within the other. The outer loops in the number of paths. It will [generatePrimaryRays]() in a buffer for each one, and sets the modulation buffer to 1/(the number of rays). Then within the for loop, we loop in the number of scattering events. We fill our surfel buffer with the surfel hit by the primary ray of each pixel. Then, we [computeShadowRays]() for each pixel in parallel. In doing so, we choose a light by sampling, and then cast a ray from the light to the surfel, and store light's biradiance, weighed by the probability of choosing it, in our biradiance buffer. Then, we fill our shadowRayBuffer by attempting to intersect our shadow rays with closer surfels, determining whether or not a shadow in cast. Having determined that, we [writeToImage] in parallel. In doing that, we..
+We have a [PathTracer]() class, which keeps a TriTree of all the triangles in the scene as state, as well as all the specifications passed in through the GUI. To trace an image, the user calls [traceImage](), providing a camera and an image. Trace image has two main for loops, one within the other. The outer loops in the number of paths. It will [generatePrimaryRays]() in a buffer for each one, and sets the modulation buffer to 1/(the number of rays). Then within the for loop, we loop in the number of scattering events. We fill our surfel buffer with the surfel hit by the primary ray of each pixel. Then, we [computeShadowRays]() for each pixel in parallel. In doing so, we choose a light by sampling, and then cast a ray from the light to the surfel, and store light's biradiance, weighed by the probability of choosing it, in our biradiance buffer. Then, we fill our shadowRayBuffer by attempting to intersect our shadow rays with closer surfels, determining whether or not a shadow in cast. Having determined that, we [writeToImage] in parallel. In doing that, we add to each pixel's current color the biradiance for it in the biradiance buffer multiplied by its surfel's finite scattering density and the dot product of the surfel's normal vector with the incoming ray's vector. Then, we in parallel [generateRecursiveRays](), using the surfel's scatter function to determine the angle we cast our new ray in for each pixel, and we update the modulation buffer to lessen the impact of the recursive rays.
 
 
 Results
@@ -29,21 +29,21 @@ Results
     Cornell Box (one path per pixel)
     -------------------------------------------------
     
-    ![Cornell Box - 1 path per pixel](http://graphicscodex.com/projects/paths/direct.png)
+    ![Cornell Box - 1 path per pixel](BasicCornell.png)
 
     Box with spheres (128 paths per pixel)
     -------------------------------------------------
    
-    ![One scattering event](http://graphicscodex.com/projects/paths/1.png width=200px) ![Two scattering events](http://graphicscodex.com/projects/paths/2.png width=200px) ![Three scattering events](http://graphicscodex.com/projects/paths/3.png width=200px) ![Four scattering events](http://graphicscodex.com/projects/paths/4.png width=200px) ![Ten scattering events](http://graphicscodex.com/projects/paths/10.png width=200px)
+    ![One scattering event](scatter1.png width=200px) ![Two scattering events](scatter2.png width=200px) ![Three scattering events](scatter3.png width=200px) ![Four scattering events](scatter4.png width=200px) ![Ten scattering events](scatter10.png width=200px)
 
 Performance
 ========================================================
-    Rendering of Sponza - One path per pixel
+    Rendering of Sponza - Paths per pixel
     -------------------------------------------------
 
     ![Scattering depth vs. Time](AnalyticSpheres2.png)
 
-    Rendering of Sponza - Scattering depth of 1 
+    Rendering of Sponza - Scattering depth
     -------------------------------------------------
 
     ![Paths per pixel vs. Time](AnalyticSpheres2.png)
@@ -52,18 +52,18 @@ Performance
 Quality Demonstration
 ========================================================
 
-![Scene Name. Rendered at 1280x720.](AnalyticSpheres2.png)
+![Sponza. Rendered at 1280x720.](Sponza.png)
 
 Phenomena Demonstration
 ========================================================
 
-![Global illumination Effect](AnalyticSpheres2.png)
+![Caustic](Caustic.png)
 
-![Global illumination Effect](AnalyticSpheres2.png)
+![Color Bleeding](ColorBleeding.png)
 
-![Global illumination Effect](AnalyticSpheres2.png)
+![Ambient Occlusion](Ambient Occlusion.png)
 
-![Global illumination Effect](AnalyticSpheres2.png)
+![Reflection](Reflection.png)
 
 Question
 ========================================================
