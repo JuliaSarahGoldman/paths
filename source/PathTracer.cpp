@@ -76,12 +76,12 @@ void PathTracer::generatePrimaryRays(Array<Ray>& rayBuffer, const shared_ptr<Cam
 
 void PathTracer::writeToImage(const Array<Ray>& shadowRayBuffer, const Array<Radiance3>& biradianceBuffer, const Array<shared_ptr<Surfel>>& surfelBuffer, const Array<Color3>& modulationBuffer, const int j, const shared_ptr<Image>& image, const Array<Ray>& rayBuffer, const Array<bool>& lightShadowedBuffer) const {
     Color3 current;
-    //image->get(Point2int32(j%image->width(), j / image->width()), current);
+    image->get(Point2int32(j%image->width(), j / image->width()), current);
     //Should apply the modulation buffer here, but just turns black
     current = L_out(surfelBuffer[j], shadowRayBuffer[j].origin(),-rayBuffer[j].direction(), biradianceBuffer[j],lightShadowedBuffer[j], rayBuffer[j].origin(), j);
-    //image->set(Point2int32(j%image->width(), j / image->width()), current);
+    image->set(Point2int32(j%image->width(), j / image->width()), current);
 
-    image->increment(Point2int32(j%image->width(), j / image->width()), current);
+    //image->increment(Point2int32(j%image->width(), j / image->width()), current);
 };
 
 void PathTracer::generateRecursiveRays(Array<Ray>& rayBuffer, const Array<shared_ptr<Surfel>>& surfelBuffer, Array<Color3>& modulationBuffer, const int j) const {
@@ -115,7 +115,8 @@ Radiance3 PathTracer::L_out(const shared_ptr<Surfel>& surfel, const Point3& Y, c
 
         const Vector3& n(surfel->shadingNormal);
         //const Vector3& w_in(Vector3::cosHemiRandom(n, Random::threadCommon()));
-        const Point3& X(surfel->position*.0001* sign((w_out).dot(n)));
+        //const Point3& X(surfel->position*.0001* sign((w_out).dot(n)));
+        const Point3& X(surfel->position);
 
         //Will be replaced with importance sampling
  //       for (int i = 0; i < lights.size(); ++i) {
@@ -176,10 +177,11 @@ void PathTracer::computeShadowRays(Array<Ray>& shadowRayBuffer, Array<Color3>& m
 
         while(counter > 0 && i <lights.size()){
             counter -= lights[i]->biradiance(X).sum();
-
+            
             index = i;
             ++i;
         }
+        //debugAssert(lights[index]->biradiance(X).sum() > 0, "zero light" );
         float weight((float)lights[index]->biradiance(X).sum()/(float)total); 
         biradianceBuffer[j] = lights[index]->biradiance(X)/weight; 
 
