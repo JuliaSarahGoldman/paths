@@ -6,7 +6,7 @@
 
 Design
 ======================================================
-We have a [PathTracer]() class, which keeps a TriTree of all the triangles in the scene as state, as well as all the specifications passed in through the GUI. To trace an image, the user calls [traceImage](), providing a camera and an image. Trace image has two main for loops, one within the other. The outer loops in the number of paths. It will [generatePrimaryRays]() in a buffer for each one, and sets the modulation buffer to 1/(the number of rays). Then within the for loop, we loop in the number of scattering events. We fill our surfel buffer with the surfel hit by the primary ray of each pixel. Then, we [computeShadowRays]() for each pixel in parallel. In doing so, we choose a light by sampling, and then cast a ray from the light to the surfel, and store light's biradiance, weighed by the probability of choosing it, in our biradiance buffer. Then, we fill our shadowRayBuffer by attempting to intersect our shadow rays with closer surfels, determining whether or not a shadow in cast. Having determined that, we [writeToImage] in parallel. In doing that, we add to each pixel's current color the biradiance for it in the biradiance buffer multiplied by its surfel's finite scattering density and the dot product of the surfel's normal vector with the incoming ray's vector. Then, we in parallel [generateRecursiveRays](), using the surfel's scatter function to determine the angle we cast our new ray in for each pixel, and we update the modulation buffer to lessen the impact of the recursive rays.
+We have a [PathTracer](class_path_tracer.html) class, which keeps a TriTree of all the triangles in the scene as state, as well as all the specifications passed in through the GUI. To trace an image, the user calls [traceImage](class_path_tracer.html#a1d3cbafc273194884120aa2fba75caef), providing a camera and an image. Trace image has two main for loops, one within the other. The outer loops in the number of paths. It will [generatePrimaryRays](class_path_tracer.html#afa6371b7272e15b0f213136eed8c0ff0) in a buffer for each one, and sets the modulation buffer to 1/(the number of rays). Then within the for loop, we loop in the number of scattering events. We fill our surfel buffer with the surfel hit by the primary ray of each pixel. Then, we [computeShadowRays](class_path_tracer.html#a7f85f1758c849eabf4e4eb5badefaea3) for each pixel in parallel. In doing so, we choose a light by sampling, and then cast a ray from the light to the surfel, and store light's biradiance, weighed by the probability of choosing it, in our biradiance buffer. Then, we fill our shadowRayBuffer by attempting to intersect our shadow rays with closer surfels, determining whether or not a shadow in cast. Having determined that, we [writeToImage](class_path_tracer.html#a43a8e2c0afaf50e26b666c91fa8ea113) in parallel. In doing that, we add to each pixel's current color the biradiance for it in the biradiance buffer multiplied by its surfel's finite scattering density and the dot product of the surfel's normal vector with the incoming ray's vector. Then, we in parallel [generateRecursiveRays](class_path_tracer.html#af6213ec93fd8a1639569b31cf1f1f1f8), using the surfel's scatter function to determine the angle we cast our new ray in for each pixel, and we update the modulation buffer to lessen the impact of the recursive rays.
 
 
 Results
@@ -14,17 +14,17 @@ Results
     Eye ray directions
     -------------------------------------------------
     
-    ![Eye ray directions](http://graphicscodex.com/projects/paths/eye-ray-directions.jpg)
+    ![Eye ray directions](eyeRay.png)
 
     World-space hit positions for Cornell Box
     -------------------------------------------------
 
-    ![World-space hit positions](http://graphicscodex.com/projects/paths/positions.png)
+    ![World-space hit positions](HitPosition.png)
 
     World-space geometric surface normals for Cornell Box
     -------------------------------------------------
 
-    ![World-space geometric surface normals](http://graphicscodex.com/projects/paths/normals.png)
+    ![World-space geometric surface normals](normal.png)
 
     Cornell Box (one path per pixel)
     -------------------------------------------------
@@ -38,15 +38,15 @@ Results
 
 Performance
 ========================================================
-    Rendering of Sponza - Paths per pixel
+    Rendering of Sponza - Scattering Depth
     -------------------------------------------------
 
-    ![Scattering depth vs. Time](AnalyticSpheres2.png)
+    ![Scattering depth vs. Time](scatterGraph.png)
 
-    Rendering of Sponza - Scattering depth
+    Rendering of Sponza - Paths per Pixel
     -------------------------------------------------
 
-    ![Paths per pixel vs. Time](AnalyticSpheres2.png)
+    ![Paths per pixel vs. Time](pathGraph.png)
 
 
 Quality Demonstration
