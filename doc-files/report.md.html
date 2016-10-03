@@ -94,7 +94,7 @@ Question
       as 50, and so on. Assume that you already have a uniform random number generator on
       the interval [0, 100].
 
-        To sample the numbers from 0 to 100...
+        First we need to initialize a counter to a uniform random number between 0 and the sum of all the numbers between 0 and 100. This can be selected using the uniform random number generator from 0 to 100. To do this, we select a random number between 0 and 100, x. Then, we select x distinct (if a number is repeated, we throw it away) numbers between 0 and 100 and sum them to get our random counter. Then, we begin subtracting the numbers from 0 to 100 from the counter, until the counter crosses over from positive to negative. Whichever number's subtraction caused the counter to go negative is the one that is chosen.
 
 5. In your own words (and with equations and diagrams as needed), present an mathematically
       rigorous argument that path tracing as presented in this project converges to a true
