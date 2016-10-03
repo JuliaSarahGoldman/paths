@@ -78,13 +78,15 @@ Question
       $r$ recursive rays. Use the variables: $n$ pixels, $d$ maximum path depth, $p$ primary
       rays per pixel, $L$ lights in the scene. It may help to draw a tree of the recursive
       calls.
-
-$O(n*d*p*L). (Will actually have powers, because recursion.)$
+        
+        Since ray tracing casts $p=1$ primary ray per pixel, each iterating through all lights, and then generating $r$ recursive rays in each level of recursion, we have time complexity
+        $$O(n*L*r^d)$$
 
  3. Derive an asymptotic bound on the run time of the path tracer from this project using the
       same variables from the previous question.
-
-$O(n*d*p*L)$
+       
+        Path tracing casts $p$ rays per $n$ pixels and for $d$ iterations each $p*n$ rays iterate through the lights once to sample, being updated at the end to one recursive ray $r=1$ and moving on to the next $d$ iteration. We then have time complexity: 
+        $$O(n*d*p*L)$$
 
  4. Derive an algorithm to sample the numbers from 0 to 100 proportional to their value.
       For example, write a random integer generator in which zero will never be returned,
@@ -92,14 +94,14 @@ $O(n*d*p*L)$
       as 50, and so on. Assume that you already have a uniform random number generator on
       the interval [0, 100].
 
-To sample the numbers from 0 to 100...
+        To sample the numbers from 0 to 100...
 
 5. In your own words (and with equations and diagrams as needed), present an mathematically
       rigorous argument that path tracing as presented in this project converges to a true
       solution to the rendering equation as the path length and number of paths per pixel
       approach infinity. State any assumptions underlying that argument explicitly.
 
-Assumptions:
+       Assumptions:
 
 
 Self Review
@@ -120,8 +122,8 @@ Mathematical Skills:
 
 Time
 ========================================================
-Minimum Viable Product:
-Polishing:
+- Minimum Viable Product: 8 hours
+- Polishing: 10 hours
 
 
 
