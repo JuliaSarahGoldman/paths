@@ -43,6 +43,4 @@ class PathTracer {
         PathTracer(const shared_ptr<Scene>& scene, int numPaths, int maxScatters);
         ~PathTracer();
         void traceImage(const shared_ptr<Camera>& cam, const shared_ptr<Image>& image);
-        
-        //Radiance3 colorSky(const Ray& ray,  const Point2int32& location);
 };
