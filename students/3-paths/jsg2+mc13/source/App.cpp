@@ -1,14 +1,14 @@
-/** \file App.cpp 
+/** \file App.cpp
 
   */
-/*  Julia Goldman
-  Matheus de Carvalho Souza
-  Jose Rivas-Garcia
-  Youle Chen
-  */
+  /*  Julia Goldman
+    Matheus de Carvalho Souza
+    Jose Rivas-Garcia
+    Youle Chen
+    */
 #include "App.h"
 #include "PathTracer.h"
-// Tells C++ to invoke command-line main() function even on OS X and Win32.
+    // Tells C++ to invoke command-line main() function even on OS X and Win32.
 G3D_START_AT_MAIN();
 
 int main(int argc, const char* argv[]) {
@@ -22,7 +22,7 @@ int main(int argc, const char* argv[]) {
 
     // Change the window and other startup parameters by modifying the
     // settings class.  For example:
-    settings.window.caption             = argv[0];
+    settings.window.caption = argv[0];
 
     // Set enable to catch more OpenGL errors
     // settings.window.debugContext     = true;
@@ -30,21 +30,21 @@ int main(int argc, const char* argv[]) {
     // Some common resolutions:
     // settings.window.width            =  854; settings.window.height       = 480;
     // settings.window.width            = 1024; settings.window.height       = 768;
-    settings.window.width               = 1280; settings.window.height       = 720;
+    settings.window.width = 1280; settings.window.height = 720;
     //settings.window.width             = 1920; settings.window.height       = 1080;
     // settings.window.width            = OSWindow::primaryDisplayWindowSize().x; settings.window.height = OSWindow::primaryDisplayWindowSize().y;
-    settings.window.fullScreen          = false;
-    settings.window.resizable           = ! settings.window.fullScreen;
-    settings.window.framed              = ! settings.window.fullScreen;
+    settings.window.fullScreen = false;
+    settings.window.resizable = !settings.window.fullScreen;
+    settings.window.framed = !settings.window.fullScreen;
 
     // Set to true for a significant performance boost if your app can't render at 60fps, or if
     // you *want* to render faster than the display.
-    settings.window.asynchronous        = false;
+    settings.window.asynchronous = false;
 
     settings.hdrFramebuffer.depthGuardBandThickness = Vector2int16(64, 64);
     settings.hdrFramebuffer.colorGuardBandThickness = Vector2int16(0, 0);
-    settings.dataDir                    = FileSystem::currentDirectory();
-    settings.screenshotDirectory        = "../journal/";
+    settings.dataDir = FileSystem::currentDirectory();
+    settings.screenshotDirectory = "../journal/";
 
     settings.renderer.deferredShading = true;
     settings.renderer.orderIndependentTransparency = false;
@@ -57,52 +57,52 @@ App::App(const GApp::Settings& settings) : GApp(settings) {
 }
 
 
-void App::makeCylinder(float radius, float height, int numVertices){
+void App::makeCylinder(float radius, float height, int numVertices) {
     TextOutput file("../data-files/model/cylinder.off");
-    file.printf(STR(OFF\n%d %d 1\n), 2*numVertices, numVertices+2);
-        //loop to make vertices
-    for(int i = 0; i < numVertices; ++i){
-        file.printf(STR(%f %f %f\n), radius*(-sin(((2*pif()*i)/numVertices))), radius*height, radius*(cos((2*pif()*i)/numVertices)));
+    file.printf(STR(OFF\n%d %d 1\n), 2 * numVertices, numVertices + 2);
+    //loop to make vertices
+    for (int i = 0; i < numVertices; ++i) {
+        file.printf(STR(%f %f %f\n), radius*(-sin(((2 * pif()*i) / numVertices))), radius*height, radius*(cos((2 * pif()*i) / numVertices)));
     }
-    for(int i = 0; i < numVertices; ++i){
-        file.printf(STR(%f 0.0 %f\n), radius*(-sin(((2*pif()*i)/numVertices))), radius*(cos((2*pif()*i)/numVertices)));
+    for (int i = 0; i < numVertices; ++i) {
+        file.printf(STR(%f 0.0 %f\n), radius*(-sin(((2 * pif()*i) / numVertices))), radius*(cos((2 * pif()*i) / numVertices)));
     }
     //Loop for sides
-    for(int i = 0; i < numVertices; ++i){
-        file.printf(STR(4 %d %d %d %d\n), i, (i+1)%numVertices, (i+1)%numVertices + numVertices, i+numVertices);
+    for (int i = 0; i < numVertices; ++i) {
+        file.printf(STR(4 % d %d %d %d\n), i, (i + 1) % numVertices, (i + 1) % numVertices + numVertices, i + numVertices);
     }
     //Loop for top
-    file.printf(STR(%d ), numVertices);
-    for(int i = numVertices-1; i >= 0; --i){
+    file.printf(STR(%d), numVertices);
+    for (int i = numVertices - 1; i >= 0; --i) {
         file.printf(" %d", i);
     }
     file.printf(STR(\n));
     //Loop for bottom
     file.printf(STR(%d), numVertices);
-    for(int i = numVertices; i < 2*numVertices; ++i){
+    for (int i = numVertices; i < 2 * numVertices; ++i) {
         file.printf(" %d", i);
     }
     file.printf(STR(\n));
     file.commit();
 }
 
-String App::makeTube(Array<float>& radii, Array<float>& heights, int slices){
-     String tube = String("OFF\n");
-     tube += format("%d %d 1\n", heights.size()*slices, (heights.size()-1)*slices);
-     for (int i = 0; i < heights.size(); ++i){
-        for(int j = 0; j < slices; ++j){
-            tube += format(STR(%f %f %f\n), radii[i]*(-sin(((2*pif()*j)/slices))), heights[i], radii[i]*(cos((2*pif()*j)/slices)));
+String App::makeTube(Array<float>& radii, Array<float>& heights, int slices) {
+    String tube = String("OFF\n");
+    tube += format("%d %d 1\n", heights.size()*slices, (heights.size() - 1)*slices);
+    for (int i = 0; i < heights.size(); ++i) {
+        for (int j = 0; j < slices; ++j) {
+            tube += format(STR(%f %f %f\n), radii[i] * (-sin(((2 * pif()*j) / slices))), heights[i], radii[i] * (cos((2 * pif()*j) / slices)));
         }
     }
-    for (int i = 0; i < heights.size()-1; ++i){
-        for(int j = 0; j < slices; ++j){
-            tube+= format(STR(4 %d %d %d %d\n), i*slices +slices + j, i*slices +slices + (j+1)%slices, i*slices + (j+1)%slices, i*slices + j );
+    for (int i = 0; i < heights.size() - 1; ++i) {
+        for (int j = 0; j < slices; ++j) {
+            tube += format(STR(4 % d %d %d %d\n), i*slices + slices + j, i*slices + slices + (j + 1) % slices, i*slices + (j + 1) % slices, i*slices + j);
         }
     }
     return tube;
 }
 
-void App::makeFountainPiece(){
+void App::makeFountainPiece() {
     int slices = 40;
     Array<float> radii(0.0, 4.0, 4.25, 4, 3.5, 3.75);
     radii.append(3.75);
@@ -116,7 +116,7 @@ void App::makeFountainPiece(){
     radii.append(4.7);
     radii.append(5.0);
     radii.append(0.0);
-    
+
     Array<float> heights(0.0, 0.0, 0.5, 1.0, 2.0, 2.5);
     heights.append(3.0);
     heights.append(3.0);
@@ -136,7 +136,7 @@ void App::makeFountainPiece(){
 }
 
 
-void App::makeTree(){
+void App::makeTree() {
     int slices = 40;
     Array<float> radii(0.0, 3.5, 3.2, 3.0, 2.9, 2.7);
     radii.append(2.9);
@@ -151,7 +151,7 @@ void App::makeTree(){
     radii.append(1.4);
     radii.append(1.2);
     radii.append(0.0);
-    
+
     Array<float> heights(0.0, 0.0, 1.0, 1.5, 2.0, 2.5);
     heights.append(3.0);
     heights.append(4.0);
@@ -171,7 +171,7 @@ void App::makeTree(){
 }
 
 
-void App::makeSplash(){
+void App::makeSplash() {
     int slices = 40;
     Array<float> radii(.5, .5, .6, .75, .63, .8);
     radii.append(.95);
@@ -183,7 +183,7 @@ void App::makeSplash(){
     radii.append(2.0);
     radii.append(1.75);
     radii.append(0.0);
-    
+
     Array<float> heights(0.0, 0.5, 0.75, 1.0, 1.25, 1.5);
     heights.append(1.75);
     heights.append(1.75);
@@ -201,7 +201,7 @@ void App::makeSplash(){
 
 
 
-void App::makeGlass(int slices){
+void App::makeGlass(int slices) {
     Array<float> radii(0.0, 1.0, 0.25, .25, 0.5, 0.7);
     radii.append(1.0);
     radii.append(1.5);
@@ -218,7 +218,7 @@ void App::makeGlass(int slices){
     heights.append(1.4);
     TextOutput file("../data-files/model/glass.off");
     file.writeSymbol(makeTube(radii, heights, slices));
- 
+
     file.commit();
 }
 
@@ -236,8 +236,8 @@ void App::onInit() {
 
     // Call setScene(shared_ptr<Scene>()) or setScene(MyScene::create()) to replace
     // the default scene here.
-    
-    showRenderingStats      = false;
+
+    showRenderingStats = false;
 
     makeGUI();
     // For higher-quality screenshots:
@@ -248,26 +248,26 @@ void App::onInit() {
         //"G3D Sponza"
         "G3D Cornell Box" // Load something simple
         //developerWindow->sceneEditorWindow->selectedSceneName()  // Load the first scene encountered 
-        );
+    );
 }
 
-void App::makeTriangles(int numTris){
+void App::makeTriangles(int numTris) {
     TextOutput file("../data-files/model/triangles.off");
-    file.printf(STR(OFF\n%d %d 1\n), 3*numTris, numTris);
-    for(int i(0); i < numTris;++i){
+    file.printf(STR(OFF\n%d %d 1\n), 3 * numTris, numTris);
+    for (int i(0); i < numTris; ++i) {
         file.printf(STR(%f %f %f\n), 0, 0, i);
         file.printf(STR(%f %f %f\n), 1.0f, 0, i);
-        file.printf(STR(%f %f %f\n), 0.5f, 0, i+0.5f);
+        file.printf(STR(%f %f %f\n), 0.5f, 0, i + 0.5f);
     }
-    for(int i(0); i < numTris; ++i){
-        file.printf(STR(3 %d %d %d\n), 3*i+2, 3*i+1, 3*i);
+    for (int i(0); i < numTris; ++i) {
+        file.printf(STR(3 % d %d %d\n), 3 * i + 2, 3 * i + 1, 3 * i);
     }
     file.printf(STR(\n));
     file.commit();
 }
 
 void App::makeGUI() {
-    
+
 
     // Initialize the developer HUD
     createDeveloperHUD();
@@ -276,47 +276,52 @@ void App::makeGUI() {
     developerWindow->videoRecordDialog->setEnabled(true);
 
     GuiPane* pathTracePane = debugPane->addPane("Path Trace");
- 
+
     pathTracePane->setNewChildSize(500, -1, 300);
     GuiText temp("1x1");
 
-    pathTracePane->addNumberBox("Light Transport Paths", &m_numPaths, " ppx", GuiTheme::LOG_SLIDER, 0, 2048) -> setUnitsSize(100);
-    pathTracePane->addNumberBox("Maximum Scatters", &m_maxScatters, "", GuiTheme::LOG_SLIDER, 0, 2048) -> setUnitsSize(100);
+    pathTracePane->addNumberBox("Light Transport Paths", &m_numPaths, " ppx", GuiTheme::LOG_SLIDER, 0, 2048)->setUnitsSize(100);
+    pathTracePane->addNumberBox("Maximum Scatters", &m_maxScatters, "", GuiTheme::LOG_SLIDER, 0, 2048)->setUnitsSize(100);
 
-    pathTracePane->addButton("Render", [this, pathTracePane](){
-        
+    pathTracePane->addButton("Render", [this, pathTracePane]() {
+
         drawMessage("Path Tracer is loading");
         shared_ptr<G3D::Image> image;
-        try{
+        try {
             PathTracer tracer = PathTracer(scene(), m_numPaths, m_maxScatters);
-            image = Image::create(320, 200, ImageFormat::RGB32F());          
+            image = Image::create(320, 200, ImageFormat::RGB32F());
             Stopwatch watch("watch");
             watch.tick();
             tracer.traceImage(activeCamera(), image);
             watch.tock();
             debugPrintf(String(std::to_string(watch.smoothElapsedTime()) + " seconds").c_str());
             show(image, String(std::to_string(watch.smoothElapsedTime()) + " seconds + Numcores = " + std::to_string(G3D::System::numCores())));
-            
-          /*  const shared_ptr<Texture>& src = Texture::fromImage("Source", image);
+
+            // Post-process
+            const shared_ptr<Texture>& src = Texture::fromImage("Source", image);
             if (m_result) {
                 m_result->resize(image->width(), image->height());
-            };
+            }
 
-            m_film->exposeAndRender(renderDevice, activeCamera()->filmSettings(), src,0, 0, m_result);
-            m_result->toImage()->save("result.png");
-            */
+            m_film->exposeAndRender(renderDevice, m_debugCamera->filmSettings(), src, 0, 0, m_result);
+           
+            shared_ptr<Image> img(m_result->toImage());
+            img->convert(ImageFormat::RGB8());
+            show(img, String(std::to_string(watch.smoothElapsedTime()) + " seconds + Numcores = " + std::to_string(G3D::System::numCores())));
+            img->save("C:/Users/cs371/Desktop/cs371/3-paths/journal/result.png"); 
             //ArticulatedModel::clearCache();
-            
+
             //loadScene(developerWindow->sceneEditorWindow->selectedSceneName());
-        }catch(...){
+        }
+        catch (...) {
             msgBox("Unable to load the image.");
         }
-        
+
     });
 
 
     GuiPane* infoPane = debugPane->addPane("Info", GuiTheme::ORNATE_PANE_STYLE);
-    
+
     // Example of how to add debugging controls
     infoPane->addLabel("Click the button below to Exit.");
     infoPane->addButton("Exit", [this]() { m_endProgram = true; });
