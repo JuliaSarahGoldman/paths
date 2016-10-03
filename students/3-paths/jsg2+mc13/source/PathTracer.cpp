@@ -28,14 +28,7 @@ void PathTracer::traceImage(const shared_ptr<Camera>& cam, const shared_ptr<Imag
 
     Array<Color3> modulationBuffer;
     modulationBuffer.resize(numPixels);
-    for (int i(0); i < numPixels; ++i) {
-        if (m_maxScatters == 0) {
-            modulationBuffer[i] = Color3(1, 1, 1);
-        }
-        else {
-            modulationBuffer[i] = Color3(1 / m_maxScatters);
-        }
-    }
+    
 
     Array<Ray> rayBuffer;
     rayBuffer.resize(numPixels);
@@ -47,8 +40,13 @@ void PathTracer::traceImage(const shared_ptr<Camera>& cam, const shared_ptr<Imag
     lightShadowedBuffer.resize(numPixels);
 
     for (int i(0); i < m_numPaths; ++i) {
-        
 
+        debugPrintf("\npath: %d\n", i);
+
+
+        modulationBuffer.setAll(Color3(1.0f / float(m_numPaths)));
+
+        
         generatePrimaryRays(rayBuffer, cam, width, height);
 
 
@@ -78,9 +76,12 @@ void PathTracer::generatePrimaryRays(Array<Ray>& rayBuffer, const shared_ptr<Cam
 
 void PathTracer::writeToImage(const Array<Ray>& shadowRayBuffer, const Array<Radiance3>& biradianceBuffer, const Array<shared_ptr<Surfel>>& surfelBuffer, const Array<Color3>& modulationBuffer, const int j, const shared_ptr<Image>& image, const Array<Ray>& rayBuffer, const Array<bool>& lightShadowedBuffer) const {
     Color3 current;
-    image->get(Point2int32(j%image->width(), j / image->width()), current);
-    current += L_out(surfelBuffer[j], shadowRayBuffer[j].origin(),-rayBuffer[j].direction(), biradianceBuffer[j],lightShadowedBuffer[j], rayBuffer[j].origin(), j);
-    image->set(Point2int32(j%image->width(), j / image->width()), current);
+    //image->get(Point2int32(j%image->width(), j / image->width()), current);
+    //Should apply the modulation buffer here, but just turns black
+    current = modulationBuffer[j]*L_out(surfelBuffer[j], shadowRayBuffer[j].origin(),-rayBuffer[j].direction(), biradianceBuffer[j],lightShadowedBuffer[j], rayBuffer[j].origin(), j);
+    //image->set(Point2int32(j%image->width(), j / image->width()), current);
+
+    image->increment(Point2int32(j%image->width(), j / image->width()), current);
 };
 
 void PathTracer::generateRecursiveRays(Array<Ray>& rayBuffer, const Array<shared_ptr<Surfel>>& surfelBuffer, Array<Color3>& modulationBuffer, const int j) const {
@@ -147,6 +148,7 @@ Radiance3 PathTracer::L_out(const shared_ptr<Surfel>& surfel, const Point3& Y, c
 
 
 Radiance3  PathTracer::backgroundRadiance(const Vector3& direction, const Point3& origin, const int j) const {
+    //return Radiance3(.5,.5,.5); //Prevents sky color from having too much effect
     Point2int32 p(origin.x, origin.y);
     Radiance3 picCol(0.0f, 0.75f, 1.0f);
     float dis(sqrt(abs((p.x - (j%m_width))*(p.x - (j%m_width)) + (p.y - (j / m_width))*(p.y - (j / m_width)))));
@@ -187,7 +189,7 @@ void PathTracer::computeShadowRays(Array<Ray>& shadowRayBuffer, Array<Color3>& m
         float  maxDistance((X - Y).length() - 0.0001);
        // const Point3& origin(Y*0.0001* sign((wo_y).dot(-surfelBuffer[j]->shadingNormal)));
         shadowRayBuffer[j] = Ray::fromOriginAndDirection(Y, wo_y, 0.0001, maxDistance);
-        modulationBuffer[j] *= weight;
+        //modulationBuffer[j] *= weight;
     }
     else {
         shadowRayBuffer[j] = Ray::fromOriginAndDirection(Point3(0, 0, 0), Vector3(1,1,1).unit(), 0.0001, 0.0002);
