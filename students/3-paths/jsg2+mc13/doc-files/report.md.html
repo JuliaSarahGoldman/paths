@@ -65,43 +65,22 @@ Phenomena Demonstration
 
 ![Reflection](Reflection.png)
 
-Question
+Questions
 ========================================================
- 1. Why does it take four scattering events to produce a caustic? Give a diagram
-      or otherwise explain what those events are.
-        
-    It takes 4 scattered rays to produce a caustic: 1 to intersect one surfel coming into the sphere, 1 to intersect the surfel coming out of the sphere, 1 to hit the surfel outside of the sohere, and 1 to hit the "eye."    
+ 1. It takes 4 scattered rays to produce a caustic: 1 to intersect one surfel coming into the sphere, 1 to intersect the surfel coming out of the sphere, 1 to hit the surfel outside of the sohere, and 1 to hit the "eye."    
 
- 2. Derive an asymptotic bound on the run time of the global illumination renderer from the
-      Rays project, were it to recurse to an arbitrary path depth. Recall that it traced one
-      primary ray per pixel, computed direct illumination from all sources, and then spawned
-      $r$ recursive rays. Use the variables: $n$ pixels, $d$ maximum path depth, $p$ primary
-      rays per pixel, $L$ lights in the scene. It may help to draw a tree of the recursive
-      calls.
-        
-        Since ray tracing casts $p=1$ primary ray per pixel, each iterating through all lights, and then generating $r$ recursive rays in each level of recursion, we have time complexity
+ 2. Since ray tracing casts $p=1$ primary ray per pixel, each iterating through all lights, and then generating $r$ recursive rays in each level of recursion, we have time complexity
         $$O(n*L*r^d)$$
 
- 3. Derive an asymptotic bound on the run time of the path tracer from this project using the
-      same variables from the previous question.
-       
-        Path tracing casts $p$ rays per $n$ pixels and for $d$ iterations each $p*n$ rays iterate through the lights once to sample, being updated at the end to one recursive ray $r=1$ and moving on to the next $d$ iteration. We then have time complexity: 
+ 3. Path tracing casts $p$ rays per $n$ pixels and for $d$ iterations each $p*n$ rays iterate through the lights once to sample, being updated at the end to one recursive ray $r=1$ and moving on to the next $d$ iteration. We then have time complexity: 
         $$O(n*d*p*L)$$
 
- 4. Derive an algorithm to sample the numbers from 0 to 100 proportional to their value.
-      For example, write a random integer generator in which zero will never be returned,
-      two will be returned twice as often as one, 100 will be returned twice as frequently
-      as 50, and so on. Assume that you already have a uniform random number generator on
-      the interval [0, 100].
+ 4. First we need to initialize a counter to a uniform random number between 0 and the sum of all the numbers between 0 and 100. This can be selected using the uniform random number generator from 0 to 100. To do this, we select a random number between 0 and 100, x. Then, we select x distinct (if a number is repeated, we throw it away) numbers between 0 and 100 and sum them to get our random counter. Then, we begin subtracting the numbers from 0 to 100 from the counter, until the counter crosses over from positive to negative. Whichever number's subtraction caused the counter to go negative is the one that is chosen.
 
-        First we need to initialize a counter to a uniform random number between 0 and the sum of all the numbers between 0 and 100. This can be selected using the uniform random number generator from 0 to 100. To do this, we select a random number between 0 and 100, x. Then, we select x distinct (if a number is repeated, we throw it away) numbers between 0 and 100 and sum them to get our random counter. Then, we begin subtracting the numbers from 0 to 100 from the counter, until the counter crosses over from positive to negative. Whichever number's subtraction caused the counter to go negative is the one that is chosen.
+5.  As the path length approaches infinity, we account for all the light in the scene, which solves for infinite scattering density $f_{X,\n}(\wi,\wo)$.
+    As the number of paths per pixel approaches infinity, we obtain infinite continuous sampling of shading at every pixel, which essentially solves the  integral in the rendering equation    
+           $$\int_{\mathbf{S}^2_+} L(X + \epsilon\wi, -\wi) \cdot f_{X,\n}(\wi,\wo) \cdot |\wi \cdot \n| ~ d\wi$$   
 
-5. In your own words (and with equations and diagrams as needed), present an mathematically
-      rigorous argument that path tracing as presented in this project converges to a true
-      solution to the rendering equation as the path length and number of paths per pixel
-      approach infinity. State any assumptions underlying that argument explicitly.
-
-       Assumptions:
 
 
 Self Review

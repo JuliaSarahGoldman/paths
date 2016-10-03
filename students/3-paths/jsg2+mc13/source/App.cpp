@@ -308,7 +308,7 @@ void App::makeGUI() {
             shared_ptr<Image> img(m_result->toImage());
             img->convert(ImageFormat::RGB8());
             show(img, String(std::to_string(watch.smoothElapsedTime()) + " seconds + Numcores = " + std::to_string(G3D::System::numCores())));
-            img->save("C:/Users/cs371/Desktop/cs371/3-paths/journal/result.png"); 
+            img->save("C:/Users/cs371/Desktop/cs371/3-paths/journal/result1.png"); 
             //ArticulatedModel::clearCache();
 
             //loadScene(developerWindow->sceneEditorWindow->selectedSceneName());
