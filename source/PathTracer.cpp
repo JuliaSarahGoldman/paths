@@ -166,22 +166,24 @@ void PathTracer::computeShadowRays(Array<Ray>& shadowRayBuffer, Array<Color3>& m
        
         
         const Point3& X(surfelBuffer[j]->position);
-        int total(0);
+        float total = 0.0f;
         for(int i(0); i< lights.size(); ++i){
             total += lights[i]->biradiance(X).sum();
         }
 
-        int counter(Random::threadCommon().uniform(0,total)); 
+        float counter = Random::threadCommon().uniform(0,total); 
         int index(0);
         int i(0);
 
         while(counter > 0 && i <lights.size()){
-            counter -= lights[i]->biradiance(X).sum();
-            
-            index = i;
+            float lRadiance(lights[i]->biradiance(X).sum());
+            counter -= lRadiance;
+            if(lRadiance > 0){
+                index = i;
+            }
             ++i;
         }
-        //debugAssert(lights[index]->biradiance(X).sum() > 0, "zero light" );
+
         float weight((float)lights[index]->biradiance(X).sum()/(float)total); 
         biradianceBuffer[j] = lights[index]->biradiance(X)/weight; 
 
