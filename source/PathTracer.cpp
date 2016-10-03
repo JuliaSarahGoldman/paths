@@ -7,15 +7,11 @@ PathTracer::PathTracer(const shared_ptr<Scene>& scene, int numPaths, int maxScat
 };
 
 void PathTracer::traceImage(const shared_ptr<Camera>& cam, const shared_ptr<Image>& image) {
-
-
-
     //Get the Array of lights
     Array<shared_ptr<Light>> lights;
     m_scene->getTypedEntityArray(lights);
     //((m_scene->lightingEnvironment()).lightArray());
     //Make the tree
-
     m_triangles.setContents(m_scene);
 
     const int width(image->width());
@@ -69,7 +65,7 @@ void PathTracer::traceImage(const shared_ptr<Camera>& cam, const shared_ptr<Imag
 void PathTracer::generatePrimaryRays(Array<Ray>& rayBuffer, const shared_ptr<Camera>& cam, int width, int height) const {
     Rect2D plane(Rect2D(Vector2(width, height)));
     Thread::runConcurrently(Point2int32(0,0),Point2int32(width, height), [&](Point2int32 pixel) {
-        Ray ray(cam->worldRay(pixel.x, pixel.y, plane));
+        Ray ray(cam->worldRay(pixel.x+0.5f, pixel.y+0.5f, plane));
         rayBuffer[pixel.x+pixel.y*width] = ray; 
     });
   };
@@ -89,11 +85,11 @@ void PathTracer::generateRecursiveRays(Array<Ray>& rayBuffer, const Array<shared
     Color3 weight;
     if (notNull(surfelBuffer[j])){
         surfelBuffer[j]->scatter(PathDirection::EYE_TO_SOURCE, -rayBuffer[j].direction(), false, Random::threadCommon(), weight, win);
-        rayBuffer[j] = Ray(surfelBuffer[j]->position, win);
+        rayBuffer[j] = Ray(surfelBuffer[j]->position, win).bumpedRay(FLT_EPSILON);
         modulationBuffer[j] *= weight;
     }
     else{
-        rayBuffer[j] = Ray::fromOriginAndDirection(Point3(0, 0, 0), Vector3(1,1,1).unit(), 0.0001, 0.0002);
+        rayBuffer[j] = Ray::fromOriginAndDirection(Point3(1000, 1000, 1000), Vector3(1,1,1).unit(), 0.0001, 0.0002);
         modulationBuffer[j] *=0;
     }
 };
@@ -104,8 +100,6 @@ Radiance3 PathTracer::L_out(const shared_ptr<Surfel>& surfel, const Point3& Y, c
         Radiance3 L(surfel->emittedRadiance(w_out)); // Emitted
 
         const Vector3& n(surfel->shadingNormal);
-        //const Vector3& w_in(Vector3::cosHemiRandom(n, Random::threadCommon()));
-        //const Point3& X(surfel->position*.0001* sign((w_out).dot(n)));
         const Point3& X(surfel->position);
 
             if (!notVisible) {
@@ -155,14 +149,15 @@ void PathTracer::computeShadowRays(Array<Ray>& shadowRayBuffer, Array<Color3>& m
         while(counter > 0 && i <lights.size()){
             float lRadiance(lights[i]->biradiance(X).sum());
             counter -= lRadiance;
-            if(lRadiance > 0){
+            if(lRadiance > 0.0){
                 index = i;
             }
             ++i;
         }
-
+        
         float weight((float)lights[index]->biradiance(X).sum()/(float)total); 
-        biradianceBuffer[j] = lights[index]->biradiance(X)/weight; 
+        
+        biradianceBuffer[j] = (weight > 0)? lights[index]->biradiance(X)/weight : lights[index]->biradiance(X); 
 
         const Point3& Y((lights[index]->position()).xyz());
         const Vector3& wo_y((X - Y).unit());
@@ -170,7 +165,7 @@ void PathTracer::computeShadowRays(Array<Ray>& shadowRayBuffer, Array<Color3>& m
         shadowRayBuffer[j] = Ray::fromOriginAndDirection(Y, wo_y, 0.0001, maxDistance);
     }
     else {
-        shadowRayBuffer[j] = Ray::fromOriginAndDirection(Point3(0, 0, 0), Vector3(1,1,1).unit(), 0.0001, 0.0002);
+        shadowRayBuffer[j] = Ray::fromOriginAndDirection(Point3(1000, 1000, 1000), Vector3(1,1,1).unit(), 0.0001, 0.0002);
     }
 };
 

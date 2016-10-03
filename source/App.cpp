@@ -272,17 +272,6 @@ void App::makeGUI() {
  
     pathTracePane->setNewChildSize(500, -1, 300);
     GuiText temp("1x1");
-    /*Array<GuiText> resolutionMenu(temp);
-    temp = "320x200";
-    resolutionMenu.append(temp);
-    temp = "640x400";
-    resolutionMenu.append(temp);
-    GuiDropDownList* list(rayTracePane->addDropDownList("Resolution", resolutionMenu));*/
-
-    /*pathTracePane->beginRow(); {
-    rayTracePane->addCheckBox("Fixed Primitives",  &m_hasFixedPrimitives, GuiTheme::NORMAL_CHECK_BOX_STYLE);
-    rayTracePane->addCheckBox("Multithreading",  &m_isMultithreaded, GuiTheme::NORMAL_CHECK_BOX_STYLE);
-    } rayTracePane->endRow();*/
 
     pathTracePane->addNumberBox("Light Transport Paths", &m_numPaths, " ppx", GuiTheme::LOG_SLIDER, 0, 2048) -> setUnitsSize(100);
     pathTracePane->addNumberBox("Maximum Scatters", &m_maxScatters, "", GuiTheme::LOG_SLIDER, 0, 2048) -> setUnitsSize(100);
@@ -301,20 +290,21 @@ void App::makeGUI() {
             debugPrintf(String(std::to_string(watch.smoothElapsedTime()) + " seconds").c_str());
             show(image, String(std::to_string(watch.smoothElapsedTime()) + " seconds + Numcores = " + std::to_string(G3D::System::numCores())));
             
-            const shared_ptr<Texture>& src = Texture::fromImage("Source", image);
+          /*  const shared_ptr<Texture>& src = Texture::fromImage("Source", image);
             if (m_result) {
                 m_result->resize(image->width(), image->height());
             };
 
             m_film->exposeAndRender(renderDevice, activeCamera()->filmSettings(), src,0, 0, m_result);
             m_result->toImage()->save("result.png");
-            
+            */
             //ArticulatedModel::clearCache();
             
             //loadScene(developerWindow->sceneEditorWindow->selectedSceneName());
         }catch(...){
             msgBox("Unable to load the image.");
         }
+        
     });
 
 
